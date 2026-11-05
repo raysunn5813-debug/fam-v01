@@ -1,0 +1,48 @@
+[
+  {
+    "id": "event-1",
+    "title": "Raymond Cantey Jr's Birthday",
+    "date": "11-18",
+    "full_date": "1977-11-18",
+    "type": "birthday",
+    "icon": "🎂",
+    "description": "Celebrating Raymond Cantey Jr's birthday!"
+  },
+  {
+    "id": "event-2",
+    "title": "Cantey & Thomas Family Reunion",
+    "date": "07-15",
+    "full_date": "2027-07-15",
+    "type": "reunion",
+    "icon": "🌳",
+    "description": "Annual Family Reunion & Barbecue in South Carolina."
+  },
+  {
+    "id": "event-3",
+    "title": "Cantey Family Wedding Anniversary",
+    "date": "06-14",
+    "full_date": "1948-06-14",
+    "type": "anniversary",
+    "icon": "💍",
+    "description": "Celebrating the historic union of the Cantey and Thomas family branches."
+  },
+  {
+    "id": "event-4",
+    "title": "Family Thanksgiving Homecoming",
+    "date": "11-26",
+    "full_date": "2026-11-26",
+    "type": "holiday",
+    "icon": "🦃",
+    "description": "Thanksgiving dinner with family, fellowship, and traditional recipes."
+  },
+  {
+    "id": "event-5",
+    "title": "Family Christmas & Heritage Gathering",
+    "date": "12-25",
+    "full_date": "2026-12-25",
+    "type": "holiday",
+    "icon": "🎄",
+    "description": "Annual Christmas celebration and exchanging of family stories."
+  }
+]
+
