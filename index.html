@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyFam - Family Portal</title>
+    <link rel="icon" href="data:,">
+    <!-- External stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- External authentication and PIN logic -->
+    <script src="/static/js/auth.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>MyFam</h1>
+    </header>
+
+    <main>
+        <!-- Step 1: Username & Password Login / Registration -->
+        <section id="auth-view" class="section">
+            <div class="auth-tabs" role="tablist" aria-label="Account options">
+                <button id="show-login" type="button" role="tab" aria-selected="true">Log in</button>
+                <button id="show-register" type="button" role="tab" aria-selected="false">Create account</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form">
+                <label>Username
+                    <input name="username" autocomplete="username" required>
+                </label>
+                <label>Password
+                    <input name="password" type="password" autocomplete="current-password" required>
+                </label>
+                <button type="submit">Log in</button>
+            </form>
+
+            <!-- Registration Form -->
+            <form id="register-form" hidden>
+                <label>Username
+                    <input name="username" autocomplete="username" required>
+                </label>
+                <label>Password (at least 8 characters)
+                    <input name="password" type="password" minlength="8" autocomplete="new-password" required>
+                </label>
+                <label>4-digit PIN
+                    <input name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="new-password" required>
+                </label>
+                <button type="submit">Create account</button>
+            </form>
+
+            <p id="auth-message" class="message" role="status" aria-live="polite"></p>
+        </section>
+
+        <!-- Step 2: Screen Full of Stars (4-Digit PIN Entry) -->
+        <section id="stars-view" class="stars-view" hidden aria-hidden="true">
+            <div class="stars-container">
+                <h2>Welcome, <span id="welcome-username"></span>!</h2>
+                <p class="subtitle">Enter your 4-digit PIN to access the portal</p>
+                <form id="pin-form">
+                    <label for="pin-input">Enter 4-Digit PIN</label>
+                    <input id="pin-input" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" class="pin-input" placeholder="••••" required>
+                    <button type="submit">Confirm &amp; Enter</button>
+                    <p id="pin-message" class="message" role="status" aria-live="polite"></p>
+                </form>
+                <button id="back-to-login" type="button" class="stars-back-btn">← Back to Log in</button>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

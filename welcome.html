@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f8f5ef">
+    <title>Welcome Family | MyFam</title>
+    <link rel="icon" href="data:,">
+    <style>
+        :root {
+            color-scheme: light;
+            --paper: #f8f5ef;
+            --ink: #29251f;
+            --muted: #71695f;
+            --line: rgba(41, 37, 31, 0.14);
+            --cantey: #7a4d39;
+            --thomas: #294b5c;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: Inter, "Segoe UI", sans-serif;
+        }
+
+        a { color: inherit; }
+
+        button, a { -webkit-tap-highlight-color: transparent; }
+
+        :focus-visible {
+            outline: 3px solid #bd8a52;
+            outline-offset: 4px;
+        }
+
+        .site-header {
+            align-items: center;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem clamp(1.25rem, 5vw, 5rem);
+        }
+
+        .brand {
+            font-family: Georgia, serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-decoration: none;
+        }
+
+        .site-header nav {
+            align-items: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+        }
+
+        .nav-link,
+        .profile-link,
+        .logout-button {
+            background: transparent;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--ink);
+            cursor: pointer;
+            font: inherit;
+            font-size: 0.88rem;
+            padding: 0.6rem 1rem;
+            text-decoration: none;
+            transition: all 150ms ease;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover,
+        .profile-link:hover,
+        .logout-button:hover {
+            background: #fff;
+            border-color: rgba(41, 37, 31, 0.3);
+        }
+
+        .resources-section {
+            margin: 4.5rem auto 2rem;
+            max-width: 1440px;
+            padding: 0 clamp(1rem, 3vw, 2.5rem);
+        }
+
+        .resources-heading {
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 2rem;
+            padding-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .resources-heading h2 {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .resources-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+
+        @media (max-width: 860px) {
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .resource-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            transition: transform 200ms ease, box-shadow 200ms ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            border-color: rgba(41, 37, 31, 0.3);
+        }
+
+        .resource-icon {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .resource-card h3 {
+            font-family: Georgia, serif;
+            font-size: 1.5rem;
+            margin: 0 0 0.5rem;
+            color: var(--ink);
+        }
+
+        .resource-card p {
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin: 0 0 1.5rem;
+            flex-grow: 1;
+        }
+
+        .resource-link-text {
+            color: var(--cantey);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .intro {
+            margin: 0 auto;
+            max-width: 760px;
+            padding: clamp(2.5rem, 6vw, 5rem) 1.25rem 2.5rem;
+            text-align: center;
+        }
+
+        .eyebrow {
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            margin: 0 0 1rem;
+            text-transform: uppercase;
+        }
+
+        h1, h2, .family-name {
+            font-family: Georgia, "Times New Roman", serif;
+            font-weight: 400;
+        }
+
+        h1 {
+            font-size: clamp(2.8rem, 7vw, 5.4rem);
+            letter-spacing: -0.045em;
+            line-height: 1;
+            margin: 0;
+        }
+
+        .intro-copy {
+            color: var(--muted);
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(1.05rem, 2vw, 1.3rem);
+            font-style: italic;
+            margin: 1.1rem 0 0;
+        }
+
+        .family-sides {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            margin: 0 auto;
+            max-width: 1440px;
+            padding: 0 clamp(1rem, 3vw, 2.5rem);
+        }
+
+        .family-card {
+            isolation: isolate;
+            min-height: clamp(390px, 51vw, 630px);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .family-card::after {
+            background: linear-gradient(180deg, rgba(15, 17, 18, 0.03) 15%, rgba(15, 17, 18, 0.68) 100%);
+            content: "";
+            inset: 0;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .family-card img {
+            height: 100%;
+            inset: 0;
+            object-fit: cover;
+            object-position: center 38%;
+            position: absolute;
+            transition: transform 650ms ease;
+            width: 100%;
+            z-index: -2;
+        }
+
+        .family-card:hover img { transform: scale(1.035); }
+
+        .cantey-card { background: #725442; }
+        .thomas-card { background: #334d5b; }
+        .thomas-card img { object-position: center 42%; }
+
+        .card-copy {
+            align-items: flex-start;
+            bottom: 0;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            left: 0;
+            padding: clamp(1.5rem, 4vw, 3.5rem);
+            position: absolute;
+            right: 0;
+        }
+
+        .card-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            margin: 0 0 0.6rem;
+            text-transform: uppercase;
+        }
+
+        .family-name {
+            font-size: clamp(3rem, 6vw, 5rem);
+            line-height: 1;
+            margin: 0;
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0.9rem 0 1.4rem;
+            max-width: 28rem;
+        }
+
+        .card-link {
+            border: 1px solid rgba(255, 255, 255, 0.82);
+            border-radius: 999px;
+            color: #fff;
+            display: inline-flex;
+            font-size: 0.88rem;
+            font-weight: 500;
+            padding: 0.75rem 1.15rem;
+            text-decoration: none;
+            transition: background 180ms ease, color 180ms ease;
+        }
+
+        .card-link:hover {
+            background: #fff;
+            color: var(--ink);
+        }
+
+        .family-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .family-actions .card-link { font-size: 0.82rem; }
+
+        .gallery {
+            margin: 0 auto;
+            max-width: 1440px;
+            padding: clamp(4rem, 8vw, 7rem) clamp(1rem, 5vw, 5rem) 1rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .gallery + .gallery { padding-top: 4rem; }
+
+        .gallery-heading {
+            align-items: end;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+        }
+
+        .gallery-heading .eyebrow { margin-bottom: 0.45rem; }
+
+        h2 {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            letter-spacing: -0.035em;
+            margin: 0;
+        }
+
+        .gallery-note {
+            color: var(--muted);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin: 0;
+            max-width: 19rem;
+            text-align: right;
+        }
+
+        .photo-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+
+        figure {
+            background: #e8e1d7;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        figure img {
+            aspect-ratio: 4 / 3;
+            display: block;
+            image-orientation: from-image;
+            object-fit: cover;
+            transition: transform 450ms ease;
+            width: 100%;
+        }
+
+        figure:hover img { transform: scale(1.025); }
+
+        figcaption {
+            color: var(--muted);
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 0.92rem;
+            padding: 0.75rem 0.85rem;
+        }
+
+        .photo-download {
+            border-top: 1px solid rgba(41, 37, 31, 0.08);
+            color: var(--thomas);
+            display: inline-block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0 0.85rem 0.8rem;
+            text-decoration: underline;
+            text-underline-offset: 0.18em;
+        }
+
+        .photo-download:hover { color: var(--cantey); }
+
+        .shared-note {
+            color: var(--muted);
+            font-size: 0.85rem;
+            line-height: 1.65;
+            margin: 1.1rem 0 0;
+        }
+
+        .shared-photo-error {
+            color: #8b2f26;
+            font-size: 0.9rem;
+        }
+
+        .family-tools {
+            margin: 0 auto;
+            max-width: 1200px;
+            padding: clamp(3rem, 7vw, 5rem) clamp(1rem, 5vw, 5rem) 0;
+            scroll-margin-top: 1.5rem;
+        }
+
+        .family-tools h2 { margin-bottom: 1.25rem; }
+
+        .tools-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .tool-panel {
+            background: #fff;
+            border: 1px solid var(--line);
+            padding: clamp(1rem, 3vw, 1.5rem);
+            scroll-margin-top: 1rem;
+        }
+
+        .tool-panel h3 {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin: 0 0 0.4rem;
+        }
+
+        .tool-description, .tool-status {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.55;
+        }
+
+        .chat-log {
+            display: grid;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            max-height: 340px;
+            min-height: 100px;
+            overflow-y: auto;
+        }
+
+        .chat-message {
+            background: var(--paper);
+            padding: 0.75rem;
+            overflow-wrap: anywhere;
+        }
+
+        .chat-message header {
+            align-items: baseline;
+            border: 0;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: space-between;
+            padding: 0 0 0.35rem;
+        }
+
+        .chat-message time {
+            color: var(--muted);
+            font-size: 0.72rem;
+        }
+
+        .chat-message p {
+            line-height: 1.5;
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        .tool-form, .chat-form {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .tool-form label, .chat-form label {
+            display: grid;
+            font-size: 0.85rem;
+            gap: 0.35rem;
+        }
+
+        .tool-form input, .tool-form select, .tool-form textarea, .chat-form textarea {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 2px;
+            color: var(--ink);
+            font: inherit;
+            padding: 0.65rem;
+            width: 100%;
+        }
+
+        .tool-form select[multiple] { min-height: 7rem; }
+        .tool-form textarea, .chat-form textarea { min-height: 5rem; resize: vertical; }
+
+        .tool-button {
+            background: var(--thomas);
+            border: 1px solid var(--thomas);
+            border-radius: 999px;
+            color: #fff;
+            cursor: pointer;
+            font: inherit;
+            justify-self: start;
+            padding: 0.65rem 1rem;
+        }
+
+        .tool-button.secondary {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .tool-button:disabled { cursor: wait; opacity: 0.65; }
+
+        .tree-list {
+            display: grid;
+            gap: 0.65rem;
+            margin: 1rem 0;
+        }
+
+        .tree-member {
+            border-left: 3px solid var(--cantey);
+            background: var(--paper);
+            padding: 0.75rem;
+        }
+
+        .tree-member p {
+            color: var(--muted);
+            font-size: 0.82rem;
+            line-height: 1.5;
+            margin: 0.35rem 0 0;
+        }
+
+        .tree-member button { margin-top: 0.6rem; }
+        .tree-form-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .tool-status.error { color: #8b2f26; }
+
+        footer {
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            margin-top: 4rem;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 720px) {
+            .family-sides { grid-template-columns: 1fr; }
+            .family-card { min-height: 500px; }
+            .photo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .gallery-heading { align-items: flex-start; flex-direction: column; }
+            .gallery-note { text-align: left; }
+            .tools-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 440px) {
+            .family-card { min-height: 430px; }
+            .photo-grid { gap: 0.65rem; }
+            figcaption { font-size: 0.82rem; padding: 0.6rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            .family-card img,
+            .family-card:hover img,
+            .card-link,
+            figure img,
+            figure:hover img { transition: none; }
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/ticker.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="/welcome">myfam</a>
+        <nav aria-label="Account navigation">
+            <a class="nav-link active" href="/welcome">Home</a>
+            <a class="nav-link" href="/photos">Photos</a>
+            <a class="nav-link" href="/documents">Documents</a>
+            <a class="nav-link" href="/book">Book</a>
+            <a class="nav-link" href="/calendar">Calendar</a>
+            <a class="profile-link" href="/profile">My profile</a>
+            <button class="logout-button" id="logout-button" type="button">Log out</button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="intro" aria-labelledby="page-title">
+            <p class="eyebrow">Cantey/Canty Thomas family · Est. in love</p>
+            <h1 id="page-title">Welcome, family.</h1>
+            <p class="intro-copy">Two family branches. One shared story.</p>
+        </section>
+
+        <section class="family-sides" aria-label="Explore the family">
+            <article class="family-card cantey-card">
+                <img src="/api/photos/Cantey/Gemini_Generated_Image_knobqjknobqjknob.jpg"
+                     alt="A cherished portrait from the Cantey/Canty family collection">
+                <div class="card-copy">
+                    <p class="card-label">The family collection</p>
+                    <h2 class="family-name">Cantey/Canty</h2>
+                    <p class="card-description">Remembering the people and moments that made us who we are.</p>
+                    <nav class="family-actions" aria-label="Cantey/Canty family links">
+                        <a class="card-link" href="/photos?family=cantey">Photos</a>
+                        <a class="card-link" href="/family/cantey/chat">Family chat</a>
+                        <a class="card-link" href="/family/cantey/tree">Family tree</a>
+                        <a class="card-link" href="/family/cantey/stories">Family stories</a>
+                    </nav>
+                </div>
+            </article>
+
+            <article class="family-card thomas-card">
+                <img src="/api/photos/Tomas/1.jpg"
+                     alt="A cherished portrait from the Thomas family collection">
+                <div class="card-copy">
+                    <p class="card-label">The family collection</p>
+                    <h2 class="family-name">Thomas</h2>
+                    <p class="card-description">A place for our memories, milestones, and generations to come.</p>
+                    <nav class="family-actions" aria-label="Thomas family links">
+                        <a class="card-link" href="/photos?family=thomas">Photos</a>
+                        <a class="card-link" href="/family/thomas/chat">Family chat</a>
+                        <a class="card-link" href="/family/thomas/tree">Family tree</a>
+                        <a class="card-link" href="/family/thomas/stories">Family stories</a>
+                    </nav>
+                </div>
+            </article>
+        </section>
+
+                <section class="resources-section" aria-labelledby="resources-title">
+            <div class="resources-heading">
+                <div>
+                    <p class="eyebrow">Shared Heritage</p>
+                    <h2 id="resources-title">Family Archives &amp; Chronicles</h2>
+                </div>
+                <span style="color: var(--muted); font-size: 0.88rem;">Preserved for generations</span>
+            </div>
+            <div class="resources-grid">
+                <a class="resource-card" href="/photos">
+                    <div class="resource-icon">📷</div>
+                    <h3>Photo Archive</h3>
+                    <p>Explore portraits, branch albums, reunions, and shared photographs uniting both sides of our family.</p>
+                    <span class="resource-link-text">Browse Photos &rarr;</span>
+                </a>
+                <a class="resource-card" href="/documents">
+                    <div class="resource-icon">📜</div>
+                    <h3>Historical Documents</h3>
+                    <p>Examine official certificates, census records, land deeds, military service records, and old family letters.</p>
+                    <span class="resource-link-text">Explore Documents &rarr;</span>
+                </a>
+                <a class="resource-card" href="/book">
+                    <div class="resource-icon">📖</div>
+                    <h3>The Family Book</h3>
+                    <p>Read compiled volumes of our ancestry, oral history interviews with elders, traditions, and Sunday recipes.</p>
+                    <span class="resource-link-text">Open Family Book &rarr;</span>
+                </a>
+                <a class="resource-card" href="/calendar">
+                    <div class="resource-icon">📅</div>
+                    <h3>Family Calendar</h3>
+                    <p>Keep track of birthdays, anniversaries, reunions, and holiday gatherings with our live milestone ticker.</p>
+                    <span class="resource-link-text">Open Calendar &rarr;</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>cantom-family.ink · Our shared heritage</footer>
+
+    <script>
+        document.getElementById('logout-button').addEventListener('click', async () => {
+            const button = document.getElementById('logout-button');
+            button.disabled = true;
+            try {
+                const tokenResponse = await fetch('/api/csrf');
+                const tokenData = await tokenResponse.json();
+                await fetch('/api/logout', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-Token': tokenData.csrf_token }
+                });
+            } finally {
+                window.location.assign('/');
+            }
+        });
+    </script>
+    <script src="/static/js/ticker.js" defer></script>
+</body>
+</html>
