@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f8f5ef">
+    <title>Family Photos | MyFam</title>
+    <link rel="icon" href="data:,">
+    <style>
+        :root {
+            color-scheme: light;
+            --paper: #f8f5ef;
+            --ink: #29251f;
+            --muted: #71695f;
+            --line: rgba(41, 37, 31, 0.14);
+            --cantey: #7a4d39;
+            --thomas: #294b5c;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: Inter, "Segoe UI", sans-serif;
+            min-height: 100vh;
+        }
+
+        a { color: inherit; }
+        button, a { -webkit-tap-highlight-color: transparent; }
+
+        :focus-visible {
+            outline: 3px solid #bd8a52;
+            outline-offset: 4px;
+        }
+
+        /* Site Header */
+        .site-header {
+            align-items: center;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+            padding: 1rem clamp(1.25rem, 5vw, 5rem);
+            background: #fdfbf7;
+        }
+
+        .brand {
+            font-family: Georgia, serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-decoration: none;
+        }
+
+        .site-header nav {
+            align-items: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+        }
+
+        .nav-link,
+        .profile-link,
+        .logout-button {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--ink);
+            cursor: pointer;
+            font: inherit;
+            font-size: 0.88rem;
+            padding: 0.6rem 1rem;
+            text-decoration: none;
+            transition: all 150ms ease;
+            background: transparent;
+        }
+
+        .nav-link:hover,
+        .profile-link:hover,
+        .logout-button:hover {
+            background: #fff;
+            border-color: rgba(41, 37, 31, 0.3);
+        }
+
+        .nav-link.active {
+            background: var(--ink);
+            color: #fff;
+            border-color: var(--ink);
+        }
+
+        /* Page Hero */
+        .page-hero {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: clamp(2.5rem, 5vw, 4rem) 1.5rem 2rem;
+            text-align: center;
+        }
+
+        .eyebrow {
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            margin: 0 0 0.75rem;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(2.5rem, 6vw, 4.2rem);
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            margin: 0 0 1rem;
+        }
+
+        .hero-desc {
+            color: var(--muted);
+            font-family: Georgia, serif;
+            font-size: 1.15rem;
+            font-style: italic;
+            margin: 0 auto 1.5rem;
+            max-width: 600px;
+        }
+
+        /* Filter Pills */
+        .filter-pills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .filter-btn {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            color: var(--ink);
+            cursor: pointer;
+            transition: all 180ms ease;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--cantey);
+        }
+
+        .filter-btn.active {
+            background: var(--cantey);
+            color: #fff;
+            border-color: var(--cantey);
+        }
+
+        /* Gallery Sections */
+        main {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 4vw, 4rem) 4rem;
+        }
+
+        .gallery-section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .section-header {
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1rem;
+            margin-bottom: 1.75rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .section-header h2 {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .section-header .note {
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .photo-grid {
+            display: grid;
+            gap: 1.25rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        }
+
+        figure {
+            background: #e8e1d7;
+            margin: 0;
+            overflow: hidden;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            transition: transform 250ms ease, box-shadow 250ms ease;
+        }
+
+        figure:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        figure img {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+            transition: transform 400ms ease;
+        }
+
+        figure:hover img {
+            transform: scale(1.03);
+        }
+
+        figcaption {
+            color: var(--ink);
+            font-family: Georgia, serif;
+            font-size: 0.95rem;
+            padding: 0.85rem 1rem 0.4rem;
+            flex-grow: 1;
+        }
+
+        .photo-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem 0.85rem;
+            border-top: 1px solid rgba(41, 37, 31, 0.08);
+            font-size: 0.82rem;
+        }
+
+        .photo-download {
+            color: var(--thomas);
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 0.18em;
+        }
+
+        .photo-download:hover {
+            color: var(--cantey);
+        }
+
+        .branch-tag {
+            color: var(--muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Lightbox modal */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 12, 14, 0.92);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 250ms ease;
+        }
+
+        .lightbox.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .lightbox img {
+            max-width: 90vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        footer {
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            padding: 2rem 1rem;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 600px) {
+            .photo-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/ticker.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="/welcome">myfam</a>
+        <nav aria-label="Main navigation">
+            <a class="nav-link" href="/welcome">Home</a>
+            <a class="nav-link active" href="/photos">Photos</a>
+            <a class="nav-link" href="/documents">Documents</a>
+            <a class="nav-link" href="/book">Book</a>
+            <a class="nav-link" href="/calendar">Calendar</a>
+            <a class="profile-link" href="/profile">My profile</a>
+            <button class="logout-button" id="logout-button" type="button">Log out</button>
+        </nav>
+    </header>
+
+    <div class="page-hero">
+        <p class="eyebrow">Family Visual Archive</p>
+        <h1>Family Photographs</h1>
+        <p class="hero-desc">Cherished faces, memorable gatherings, and generations of our shared story.</p>
+        
+        <div class="filter-pills" role="tablist">
+            <button class="filter-btn active" data-filter="all">All Photographs</button>
+            <button class="filter-btn" data-filter="cantey">Cantey/Canty</button>
+            <button class="filter-btn" data-filter="thomas">Thomas</button>
+            <button class="filter-btn" data-filter="shared">Shared Heritage</button>
+        </div>
+    </div>
+
+    <main>
+        <!-- Cantey Branch Gallery -->
+        <section class="gallery-section" id="cantey-gallery" data-branch="cantey">
+            <div class="section-header">
+                <h2>Cantey / Canty Collection</h2>
+                <span class="note">Portraits &amp; memories from the Cantey branch</span>
+            </div>
+            <div class="photo-grid">
+                <figure>
+                    <img src="/api/photos/Cantey/Gemini_Generated_Image_knobqjknobqjknob.jpg"
+                         alt="Cantey/Canty family portrait" loading="lazy" onclick="openLightbox(this.src, this.alt)">
+                    <figcaption>Cantey/Canty Family Portrait</figcaption>
+                    <div class="photo-footer">
+                        <span class="branch-tag">Cantey</span>
+                        <a class="photo-download" href="/api/photos/Cantey/Gemini_Generated_Image_knobqjknobqjknob.jpg?download=1" download>Download</a>
+                    </div>
+                </figure>
+                <figure>
+                    <img src="/api/photos/Cantey/CAM01380-1.jpg"
+                         alt="Cantey family gathering" loading="lazy" onclick="openLightbox(this.src, this.alt)">
+                    <figcaption>Cherished Family Gathering</figcaption>
+                    <div class="photo-footer">
+                        <span class="branch-tag">Cantey</span>
+                        <a class="photo-download" href="/api/photos/Cantey/CAM01380-1.jpg?download=1" download>Download</a>
+                    </div>
+                </figure>
+            </div>
+        </section>
+
+        <!-- Thomas Branch Gallery -->
+        <section class="gallery-section" id="thomas-gallery" data-branch="thomas">
+            <div class="section-header">
+                <h2>Thomas Collection</h2>
+                <span class="note">Portraits &amp; memories from the Thomas branch</span>
+            </div>
+            <div class="photo-grid">
+                <figure>
+                    <img src="/api/photos/Tomas/1.jpg"
+                         alt="Thomas family portrait" loading="lazy" onclick="openLightbox(this.src, this.alt)">
+                    <figcaption>Thomas Family Portrait</figcaption>
+                    <div class="photo-footer">
+                        <span class="branch-tag">Thomas</span>
+                        <a class="photo-download" href="/api/photos/Tomas/1.jpg?download=1" download>Download</a>
+                    </div>
+                </figure>
+                <figure>
+                    <img src="/api/photos/Tomas/CAM01344.jpg"
+                         alt="Thomas family members together" loading="lazy" onclick="openLightbox(this.src, this.alt)">
+                    <figcaption>Family Members Together</figcaption>
+                    <div class="photo-footer">
+                        <span class="branch-tag">Thomas</span>
+                        <a class="photo-download" href="/api/photos/Tomas/CAM01344.jpg?download=1" download>Download</a>
+                    </div>
+                </figure>
+                <figure>
+                    <img src="/api/photos/Tomas/CAM00566.jpg"
+                         alt="Thomas family memory" loading="lazy" onclick="openLightbox(this.src, this.alt)">
+                    <figcaption>From the Archive</figcaption>
+                    <div class="photo-footer">
+                        <span class="branch-tag">Thomas</span>
+                        <a class="photo-download" href="/api/photos/Tomas/CAM00566.jpg?download=1" download>Download</a>
+                    </div>
+                </figure>
+                <figure>
+                    <img src="/api/photos/Tomas/CAM01319.jpg"
+                         alt="Thomas family member" loading="lazy" onclick="openLightbox(this.src, this.alt)">
+                    <figcaption>Generational Memory</figcaption>
+                    <div class="photo-footer">
+                        <span class="branch-tag">Thomas</span>
+                        <a class="photo-download" href="/api/photos/Tomas/CAM01319.jpg?download=1" download>Download</a>
+                    </div>
+                </figure>
+                <figure>
+                    <img src="/api/photos/Tomas/CAM01342.jpg"
+                         alt="Thomas family milestone" loading="lazy" onclick="openLightbox(this.src, this.alt)">
+                    <figcaption>Family Milestone</figcaption>
+                    <div class="photo-footer">
+                        <span class="branch-tag">Thomas</span>
+                        <a class="photo-download" href="/api/photos/Tomas/CAM01342.jpg?download=1" download>Download</a>
+                    </div>
+                </figure>
+                <figure>
+                    <img src="/api/photos/Tomas/CAM02224-1-1.jpg"
+                         alt="Thomas family memory" loading="lazy" onclick="openLightbox(this.src, this.alt)">
+                    <figcaption>Together in Joy</figcaption>
+                    <div class="photo-footer">
+                        <span class="branch-tag">Thomas</span>
+                        <a class="photo-download" href="/api/photos/Tomas/CAM02224-1-1.jpg?download=1" download>Download</a>
+                    </div>
+                </figure>
+            </div>
+        </section>
+
+        <!-- Shared Photographs Gallery -->
+        <section class="gallery-section" id="shared-gallery" data-branch="shared">
+            <div class="section-header">
+                <h2>Shared Family Heritage</h2>
+                <span class="note">Photographs uniting both sides of our family tree</span>
+            </div>
+            <div class="photo-grid" id="shared-photo-grid">
+                <!-- Dynamically loaded from /api/shared-photos -->
+            </div>
+            <p id="shared-photo-status" style="color: var(--muted); font-size: 0.9rem; margin-top: 1rem;"></p>
+        </section>
+    </main>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+        <button class="lightbox-close" type="button" aria-label="Close photo preview">&times;</button>
+        <img id="lightbox-img" src="" alt="">
+    </div>
+
+    <footer>cantom-family.ink · Our shared heritage</footer>
+
+    <script>
+        // Lightbox logic
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(src, alt) {
+            lightboxImg.src = src;
+            lightboxImg.alt = alt || 'Family photo preview';
+            lightbox.classList.add('active');
+        }
+
+        function closeLightbox(e) {
+            if (e.target === lightbox || e.target.classList.contains('lightbox-close')) {
+                lightbox.classList.remove('active');
+            }
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+                lightbox.classList.remove('active');
+            }
+        });
+
+        // Filter Pills
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const sections = document.querySelectorAll('.gallery-section');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filter = btn.dataset.filter;
+
+                sections.forEach(sec => {
+                    if (filter === 'all' || sec.dataset.branch === filter) {
+                        sec.style.display = 'block';
+                    } else {
+                        sec.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Check URL params for pre-filtering (e.g. /photos?family=cantey or #cantey-gallery)
+        const urlParams = new URLSearchParams(window.location.search);
+        const familyParam = urlParams.get('family');
+        if (familyParam) {
+            const targetBtn = document.querySelector(`.filter-btn[data-filter="${familyParam}"]`);
+            if (targetBtn) targetBtn.click();
+        }
+
+        // Shared Photos Loader
+        async function loadSharedPhotos() {
+            const grid = document.getElementById('shared-photo-grid');
+            const status = document.getElementById('shared-photo-status');
+            try {
+                const response = await fetch('/api/shared-photos');
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Unable to load shared family photos.');
+
+                if (!data.photos || !data.photos.length) {
+                    status.textContent = 'No shared photos available yet.';
+                    return;
+                }
+
+                data.photos.forEach((filename, index) => {
+                    const photoUrl = `/api/photos/both/${encodeURIComponent(filename)}`;
+                    const figure = document.createElement('figure');
+
+                    const img = document.createElement('img');
+                    img.src = photoUrl;
+                    img.alt = `Shared family memory ${index + 1}`;
+                    img.loading = 'lazy';
+                    img.onclick = () => openLightbox(photoUrl, img.alt);
+
+                    const figcaption = document.createElement('figcaption');
+                    figcaption.textContent = `Shared Memory #${index + 1}`;
+
+                    const footer = document.createElement('div');
+                    footer.className = 'photo-footer';
+
+                    const tag = document.createElement('span');
+                    tag.className = 'branch-tag';
+                    tag.textContent = 'Both Branches';
+
+                    const download = document.createElement('a');
+                    download.className = 'photo-download';
+                    download.href = `${photoUrl}?download=1`;
+                    download.download = filename;
+                    download.textContent = 'Download';
+
+                    footer.append(tag, download);
+                    figure.append(img, figcaption, footer);
+                    grid.appendChild(figure);
+                });
+            } catch (err) {
+                status.textContent = err.message;
+            }
+        }
+        loadSharedPhotos();
+
+        // Logout button
+        document.getElementById('logout-button').addEventListener('click', async () => {
+            const button = document.getElementById('logout-button');
+            button.disabled = true;
+            try {
+                const tokenResponse = await fetch('/api/csrf');
+                const tokenData = await tokenResponse.json();
+                await fetch('/api/logout', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-Token': tokenData.csrf_token }
+                });
+                window.location.assign('/');
+            } catch {
+                window.location.assign('/');
+            }
+        });
+    </script>
+    <script src="/static/js/ticker.js" defer></script>
+</body>
+</html>
+

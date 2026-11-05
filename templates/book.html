@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f8f5ef">
+    <title>Family Books &amp; Library | MyFam</title>
+    <link rel="icon" href="data:,">
+    <style>
+        :root {
+            color-scheme: light;
+            --paper: #f8f5ef;
+            --ink: #29251f;
+            --muted: #71695f;
+            --line: rgba(41, 37, 31, 0.14);
+            --cantey: #7a4d39;
+            --thomas: #294b5c;
+            --leather: #4a2c1d;
+            --gold: #b38646;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: Inter, "Segoe UI", sans-serif;
+            min-height: 100vh;
+        }
+
+        a { color: inherit; }
+        button, a { -webkit-tap-highlight-color: transparent; }
+
+        :focus-visible {
+            outline: 3px solid #bd8a52;
+            outline-offset: 4px;
+        }
+
+        /* Site Header */
+        .site-header {
+            align-items: center;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+            padding: 1rem clamp(1.25rem, 5vw, 5rem);
+            background: #fdfbf7;
+        }
+
+        .brand {
+            font-family: Georgia, serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-decoration: none;
+        }
+
+        .site-header nav {
+            align-items: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+        }
+
+        .nav-link,
+        .profile-link,
+        .logout-button {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--ink);
+            cursor: pointer;
+            font: inherit;
+            font-size: 0.88rem;
+            padding: 0.6rem 1rem;
+            text-decoration: none;
+            transition: all 150ms ease;
+            background: transparent;
+        }
+
+        .nav-link:hover,
+        .profile-link:hover,
+        .logout-button:hover {
+            background: #fff;
+            border-color: rgba(41, 37, 31, 0.3);
+        }
+
+        .nav-link.active {
+            background: var(--ink);
+            color: #fff;
+            border-color: var(--ink);
+        }
+
+        /* Hero */
+        .page-hero {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: clamp(2.5rem, 5vw, 4rem) 1.5rem 2rem;
+            text-align: center;
+        }
+
+        .eyebrow {
+            color: var(--gold);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            margin: 0 0 0.8rem;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(2.5rem, 6vw, 4.2rem);
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            margin: 0 0 1rem;
+        }
+
+        .hero-desc {
+            color: var(--muted);
+            font-family: Georgia, serif;
+            font-size: 1.15rem;
+            font-style: italic;
+            margin: 0 auto 1.5rem;
+            max-width: 650px;
+            line-height: 1.5;
+        }
+
+        /* Section Header */
+        .section-header {
+            border-bottom: 2px solid var(--line);
+            padding-bottom: 0.75rem;
+            margin: 2.5rem 0 1.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .section-header h2 {
+            font-family: Georgia, serif;
+            font-size: 1.85rem;
+            font-weight: 400;
+            margin: 0;
+            color: var(--leather);
+        }
+
+        .section-header span {
+            color: var(--muted);
+            font-size: 0.88rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* Bookshelf Grid */
+        main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 4vw, 3rem) 4rem;
+        }
+
+        .bookshelf-grid {
+            display: grid;
+            gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        }
+
+        .book-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            transition: transform 220ms ease, box-shadow 220ms ease;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+            border-color: var(--gold);
+        }
+
+        /* 3D Bookplate Cover Art */
+        .book-cover {
+            padding: 2.25rem 1.75rem;
+            position: relative;
+            min-height: 230px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #fff;
+            box-shadow: inset 5px 0 12px rgba(0,0,0,0.4), inset -2px 0 6px rgba(255,255,255,0.1);
+        }
+
+        /* Cover Themes */
+        .theme-ruby { background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 60%, #991b1b 100%); }
+        .theme-midnight { background: linear-gradient(135deg, #09090b 0%, #18181b 60%, #27272a 100%); }
+        .theme-sapphire { background: linear-gradient(135deg, #082f49 0%, #0369a1 60%, #0284c7 100%); }
+        .theme-bronze { background: linear-gradient(135deg, #271406 0%, #78350f 60%, #92400e 100%); }
+        .theme-emerald { background: linear-gradient(135deg, #022c22 0%, #065f46 60%, #047857 100%); }
+        .theme-olive { background: linear-gradient(135deg, #142010 0%, #365314 60%, #3f6212 100%); }
+        .theme-steel { background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%); }
+        .theme-leather { background: linear-gradient(135deg, #24140d 0%, #4a2c1d 60%, #5c3826 100%); }
+
+        /* Filigree border on cover */
+        .cover-border {
+            border: 2px solid rgba(212, 175, 55, 0.65);
+            border-radius: 4px;
+            padding: 1.25rem 1rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .cover-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cover-icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .cover-category {
+            font-size: 0.68rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #fde047;
+            font-weight: 700;
+            background: rgba(0,0,0,0.35);
+            padding: 0.25rem 0.55rem;
+            border-radius: 999px;
+            border: 1px solid rgba(253, 224, 71, 0.3);
+        }
+
+        .cover-title {
+            font-family: Georgia, serif;
+            font-size: 1.35rem;
+            line-height: 1.25;
+            margin: 0.85rem 0 0.35rem;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+        }
+
+        .cover-author {
+            font-size: 0.82rem;
+            color: #fef08a;
+            font-style: italic;
+            margin: 0;
+        }
+
+        .cover-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.75);
+            text-transform: uppercase;
+            border-top: 1px dashed rgba(212, 175, 55, 0.4);
+            padding-top: 0.6rem;
+            margin-top: 0.85rem;
+        }
+
+        /* Book Info Body */
+        .book-body {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .book-desc {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.55;
+            margin: 0 0 1.25rem;
+            flex-grow: 1;
+        }
+
+        .book-actions {
+            display: flex;
+            gap: 0.65rem;
+            align-items: center;
+            border-top: 1px solid var(--line);
+            padding-top: 1rem;
+        }
+
+        .btn-read {
+            flex: 1;
+            background: var(--leather);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 0.65rem 1rem;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 150ms ease;
+            text-align: center;
+        }
+
+        .btn-read:hover {
+            background: #2e1a10;
+        }
+
+        .btn-download {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            color: var(--ink);
+            padding: 0.65rem 0.95rem;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 150ms ease;
+            white-space: nowrap;
+        }
+
+        .btn-download:hover {
+            background: #fff;
+            border-color: var(--thomas);
+            color: var(--thomas);
+        }
+
+        /* Fullscreen PDF Reader Modal */
+        .reader-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .reader-modal.active {
+            display: flex;
+        }
+
+        .reader-header {
+            background: #1e293b;
+            color: #fff;
+            padding: 0.85rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .reader-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-family: Georgia, serif;
+            font-weight: 400;
+        }
+
+        .reader-close {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 999px;
+            color: #fff;
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 150ms;
+        }
+
+        .reader-close:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .reader-frame {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #334155;
+        }
+
+        footer {
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            padding: 2rem 1rem;
+            text-align: center;
+            text-transform: uppercase;
+            margin-top: 4rem;
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/ticker.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="/welcome">myfam</a>
+        <nav aria-label="Main navigation">
+            <a class="nav-link" href="/welcome">Home</a>
+            <a class="nav-link" href="/photos">Photos</a>
+            <a class="nav-link" href="/documents">Documents</a>
+            <a class="nav-link active" href="/book">Book</a>
+            <a class="nav-link" href="/calendar">Calendar</a>
+            <a class="profile-link" href="/profile">My profile</a>
+            <button class="logout-button" id="logout-button" type="button">Log out</button>
+        </nav>
+    </header>
+
+    <div class="page-hero">
+        <p class="eyebrow">Digital Library &amp; Living Chronicle</p>
+        <h1>Family Books &amp; Library</h1>
+        <p class="hero-desc">The library of texts, reference publications, historical books, and memory albums preserving our family heritage.</p>
+    </div>
+
+    <main>
+        <div class="section-header">
+            <h2>Bookshelf Collection</h2>
+            <span>{{ books|length }} Volumes Stored in Library</span>
+        </div>
+
+        <div class="bookshelf-grid" id="bookshelf">
+            {% if books %}
+                {% for book in books %}
+                <article class="book-card" data-filename="{{ book.filename }}">
+                    <div class="book-cover theme-{{ book.theme }}">
+                        <div class="cover-border">
+                            <div class="cover-top">
+                                <span class="cover-icon">{{ book.icon }}</span>
+                                <span class="cover-category">{{ book.category }}</span>
+                            </div>
+                            <div>
+                                <h3 class="cover-title">{{ book.title }}</h3>
+                                <p class="cover-author">{{ book.author }}</p>
+                            </div>
+                            <div class="cover-footer">
+                                <span>{{ book.edition }}</span>
+                                <span>{{ book.size }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="book-body">
+                        <p class="book-desc">{{ book.description }}</p>
+                        <div class="book-actions">
+                            <button class="btn-read" type="button" onclick="openReader('{{ book.url }}', '{{ book.title|escape }}')">📖 Read Book</button>
+                            <a class="btn-download" href="{{ book.url }}?download=1" download title="Download full PDF">⬇ Download</a>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            {% else %}
+                <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 3rem;">Loading book collection...</p>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- PDF Reader Modal -->
+    <div id="reader-modal" class="reader-modal" role="dialog" aria-modal="true" aria-labelledby="reader-title">
+        <div class="reader-header">
+            <h3 id="reader-title">Book Reader</h3>
+            <button class="reader-close" type="button" onclick="closeReader()">&times; Close Reader</button>
+        </div>
+        <iframe id="reader-frame" class="reader-frame" src="about:blank" title="PDF Document Viewer"></iframe>
+    </div>
+
+    <footer>cantom-family.ink · Our shared heritage</footer>
+
+    <script>
+        const readerModal = document.getElementById('reader-modal');
+        const readerFrame = document.getElementById('reader-frame');
+        const readerTitle = document.getElementById('reader-title');
+
+        function openReader(url, title) {
+            readerTitle.textContent = title || 'Book Reader';
+            readerFrame.src = url;
+            readerModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeReader() {
+            readerModal.classList.remove('active');
+            readerFrame.src = 'about:blank';
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && readerModal.classList.contains('active')) {
+                closeReader();
+            }
+        });
+
+        // Logout
+        document.getElementById('logout-button').addEventListener('click', async () => {
+            try {
+                const tokenResponse = await fetch('/api/csrf');
+                const tokenData = await tokenResponse.json();
+                await fetch('/api/logout', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-Token': tokenData.csrf_token }
+                });
+            } finally {
+                window.location.assign('/');
+            }
+        });
+    </script>
+    <script src="/static/js/ticker.js" defer></script>
+</body>
+</html>

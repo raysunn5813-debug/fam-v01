@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#e9ddc9">
+    <link rel="icon" href="data:,">
+    <title>{{ family_label }} Family Stories</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: #302d29;
+            background: #e9ddc9;
+            --ink: #302d29;
+            --muted: #71695f;
+            --line: #d7c8b3;
+            --wood: #694d38;
+            --gold: #b99559;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            background-color: #e9ddc9;
+            background-image:
+                radial-gradient(ellipse at 18% 25%, rgba(255,255,255,0.28), transparent 40%),
+                radial-gradient(ellipse at 82% 72%, rgba(116,76,45,0.08), transparent 42%),
+                repeating-linear-gradient(3deg, rgba(89,64,43,0.025) 0, rgba(89,64,43,0.025) 1px, transparent 1px, transparent 5px);
+            margin: 0;
+            min-height: 100vh;
+        }
+        .visually-hidden {
+            clip: rect(0, 0, 0, 0);
+            clip-path: inset(50%);
+            height: 1px;
+            overflow: hidden;
+            position: absolute;
+            white-space: nowrap;
+            width: 1px;
+        }
+        main { margin: 0 auto; max-width: 1440px; padding: 1.5rem clamp(1rem, 4vw, 3.5rem) 4rem; }
+        nav { align-items: center; display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 2rem; }
+        nav a {
+            background: rgba(255,255,255,0.55);
+            border: 1px solid rgba(105,77,56,0.22);
+            border-radius: 999px;
+            color: #5c4033;
+            font-size: 0.82rem;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+        }
+        nav a:hover { background: #5c4033; color: #fffaf2; }
+        .hero { margin: 0 auto 2rem; max-width: 780px; text-align: center; }
+        .eyebrow { color: #806a4d; font-size: 0.73rem; font-weight: 600; letter-spacing: 0.19em; text-transform: uppercase; }
+        h1, h2 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; }
+        h1 { font-size: clamp(2.7rem, 6vw, 4.8rem); letter-spacing: -0.035em; line-height: 1.05; margin: 0.35rem 0 0.75rem; }
+        .hero p:last-child { color: var(--muted); font-family: Georgia, "Times New Roman", serif; font-size: 1.1rem; font-style: italic; line-height: 1.65; margin: 0; }
+        .toolbar { align-items: center; display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: space-between; margin: 0 0 1.1rem; }
+        .toolbar-copy { color: #675a4b; font-size: 0.92rem; margin: 0; }
+        .toolbar-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 0.6rem; }
+        .toolbar input, .toolbar select, input, select, textarea {
+            background: #fffdf8;
+            border: 1px solid #d5c6af;
+            border-radius: 0.35rem;
+            color: var(--ink);
+            font: inherit;
+            max-width: 100%;
+            padding: 0.7rem 0.75rem;
+        }
+        .toolbar input { min-width: min(16rem, 75vw); }
+        button {
+            background: #5c4033;
+            border: 1px solid #5c4033;
+            border-radius: 999px;
+            color: #fffaf2;
+            cursor: pointer;
+            font: inherit;
+            padding: 0.7rem 1rem;
+        }
+        button:hover { background: #755640; }
+        button.secondary { background: transparent; color: #5c4033; }
+        button.secondary:hover { background: rgba(255,255,255,0.65); }
+        button:disabled { cursor: wait; opacity: 0.65; }
+        .status { color: var(--muted); line-height: 1.55; min-height: 1.5rem; }
+        .status.error, .form-error { color: #a3332a; }
+        .board {
+            background-color: #ad8b65;
+            background-image:
+                radial-gradient(ellipse at 20% 30%, rgba(255,255,255,0.12), transparent 48%),
+                radial-gradient(ellipse at 80% 70%, rgba(63,39,22,0.11), transparent 52%),
+                repeating-linear-gradient(88deg, rgba(77,51,31,0.055) 0, rgba(77,51,31,0.055) 1px, transparent 1px, transparent 8px);
+            border: 12px solid #76583e;
+            border-radius: 0.45rem;
+            box-shadow: inset 0 0 0 2px rgba(245,224,190,0.25), 0 16px 38px rgba(57,42,29,0.2);
+            min-height: 300px;
+            padding: clamp(1.25rem, 3.2vw, 2.8rem);
+        }
+        .board-grid { align-items: start; display: grid; gap: 1.7rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); }
+        .story-note {
+            background: #fff0a8;
+            box-shadow: 0 8px 14px rgba(47,34,21,0.24), 0 2px 3px rgba(47,34,21,0.12);
+            min-height: 235px;
+            overflow-wrap: anywhere;
+            padding: 1.55rem 1.2rem 1.2rem;
+            position: relative;
+            transform: rotate(-1deg);
+            transition: box-shadow 180ms ease, transform 180ms ease;
+        }
+        .story-note:nth-child(4n + 2) { background: #f7d8b8; transform: rotate(1.2deg); }
+        .story-note:nth-child(4n + 3) { background: #dce8cb; transform: rotate(-0.6deg); }
+        .story-note:nth-child(4n) { background: #d8e6e5; transform: rotate(1deg); }
+        .story-note:hover { box-shadow: 0 14px 22px rgba(47,34,21,0.28); transform: rotate(0) translateY(-3px); z-index: 1; }
+        .story-pin {
+            background: radial-gradient(circle at 35% 30%, #fff8df 0 10%, #a44130 11% 62%, #6f2e25 63% 100%);
+            border-radius: 50%;
+            box-shadow: 1px 3px 4px rgba(36,25,17,0.35);
+            height: 17px;
+            left: calc(50% - 8px);
+            position: absolute;
+            top: 8px;
+            width: 17px;
+        }
+        .note-heading { align-items: flex-start; display: flex; gap: 0.5rem; justify-content: space-between; }
+        .note-category { color: #70573e; font-size: 0.67rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+        .note-actions { display: flex; gap: 0.35rem; }
+        .note-actions button { background: transparent; border: 0; color: #5f4b39; font-size: 0.75rem; padding: 0.15rem; text-decoration: underline; text-underline-offset: 0.15em; }
+        .note-actions button:hover { color: #a3332a; }
+        .story-note h2 { font-size: 1.4rem; line-height: 1.2; margin: 0.8rem 0 0.45rem; overflow-wrap: anywhere; }
+        .about-line { color: #6b5b4b; font-family: Georgia, "Times New Roman", serif; font-size: 0.9rem; font-style: italic; margin: 0 0 0.85rem; }
+        .story-text { color: #3b352e; line-height: 1.65; margin: 0; white-space: pre-wrap; }
+        .audio-player { display: block; margin-top: 1rem; max-width: 100%; width: 100%; }
+        .note-footer { border-top: 1px solid rgba(62,49,35,0.18); color: #695b4d; display: flex; flex-wrap: wrap; font-size: 0.72rem; gap: 0.35rem 0.8rem; justify-content: space-between; margin-top: 1rem; padding-top: 0.65rem; }
+        .empty-state { color: #fff9ee; margin: 1rem auto; max-width: 36rem; text-align: center; }
+        .empty-state h2 { font-size: 1.7rem; margin: 0 0 0.45rem; }
+        .empty-state p { line-height: 1.6; margin: 0; }
+        dialog {
+            background: #fbf8f1;
+            border: 1px solid #c8b18f;
+            border-radius: 0.65rem;
+            box-shadow: 0 22px 70px rgba(32,25,18,0.38);
+            color: var(--ink);
+            max-height: min(90vh, 850px);
+            max-width: 620px;
+            overflow-y: auto;
+            padding: clamp(1.1rem, 4vw, 2rem);
+            width: calc(100% - 2rem);
+        }
+        dialog::backdrop { background: rgba(39,31,24,0.55); }
+        dialog h2 { font-size: 1.8rem; margin: 0; }
+        .dialog-heading { align-items: flex-start; display: flex; gap: 1rem; justify-content: space-between; margin-bottom: 1.2rem; }
+        .dialog-heading button { flex: 0 0 auto; padding: 0.45rem 0.8rem; }
+        form { display: grid; gap: 0.9rem; }
+        form label { display: grid; font-size: 0.88rem; gap: 0.4rem; }
+        textarea { min-height: 145px; resize: vertical; }
+        .field-help { color: var(--muted); font-size: 0.8rem; line-height: 1.5; margin: -0.35rem 0 0; }
+        .audio-tools { background: #f0e9dd; border: 1px solid #ded2c0; display: grid; gap: 0.65rem; padding: 0.85rem; }
+        .audio-tools h3 { font-family: Georgia, "Times New Roman", serif; font-size: 1.05rem; font-weight: 400; margin: 0; }
+        .audio-buttons { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+        .audio-buttons button { font-size: 0.84rem; padding: 0.55rem 0.85rem; }
+        .recording-status { color: var(--muted); font-size: 0.82rem; margin: 0; min-height: 1.2em; }
+        .audio-preview audio { display: block; max-width: 100%; width: 100%; }
+        .form-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.25rem; }
+        .form-error { min-height: 1.2rem; margin: 0; }
+        [hidden] { display: none; }
+        @media (max-width: 600px) {
+            main { padding-top: 1rem; }
+            nav { margin-bottom: 1.5rem; }
+            .toolbar { align-items: stretch; }
+            .toolbar-actions { align-items: stretch; flex-direction: column; }
+            .toolbar input { min-width: 0; width: 100%; }
+            .board { border-width: 8px; padding: 1rem; }
+            .board-grid { gap: 1.1rem; grid-template-columns: 1fr; }
+            .story-note { min-height: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto; transition-duration: 0.01ms; }
+            .story-note { transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <nav aria-label="Family pages">
+            <a href="/welcome">← Family home</a>
+            <a href="/family/{{ other_family }}/stories">{{ other_family_label }} stories</a>
+            <a href="/family/{{ family }}/chat">Family chat</a>
+            <a href="/family/{{ family }}/tree">Family tree</a>
+            <a href="/profile">My profile</a>
+        </nav>
+        <header class="hero">
+            <p class="eyebrow">Our people, in their own words</p>
+            <h1>{{ family_label }} Family Stories</h1>
+            <p>A place to remember those we miss, share the stories we carry, and leave a little family history for the next generation.</p>
+        </header>
+        <section aria-label="Family stories">
+            <div class="toolbar">
+                <p id="status" class="toolbar-copy status" role="status" aria-live="polite">Loading family stories…</p>
+                <div class="toolbar-actions">
+                    <label class="visually-hidden" for="story-search">Search stories</label>
+                    <input id="story-search" type="search" placeholder="Search stories">
+                    <label class="visually-hidden" for="story-filter">Filter stories</label>
+                    <select id="story-filter">
+                        <option value="all">All stories</option>
+                        <option value="memory">Memories</option>
+                        <option value="history">Family history</option>
+                    </select>
+                    <button id="add-story" type="button">＋ Add a story</button>
+                </div>
+            </div>
+            <div class="board">
+                <div id="story-board" class="board-grid"></div>
+                <div id="empty-state" class="empty-state" hidden>
+                    <h2>This board is waiting for your stories.</h2>
+                    <p>Add a written memory, record a voice message, or share a bit of family history. Your story will appear here as a note on the board.</p>
+                </div>
+                <p id="no-results" class="empty-state" hidden>No stories match this search. Try another name or filter.</p>
+            </div>
+        </section>
+    </main>
+
+    <dialog id="story-dialog" aria-labelledby="dialog-title">
+        <div class="dialog-heading">
+            <div>
+                <p class="eyebrow">Leave something to remember</p>
+                <h2 id="dialog-title">Add a family story</h2>
+            </div>
+            <button id="close-dialog" class="secondary" type="button" aria-label="Close story form">Close</button>
+        </div>
+        <form id="story-form" enctype="multipart/form-data">
+            <input type="hidden" name="story_id">
+            <input type="hidden" name="remove_audio" value="false">
+            <label for="story-title">Story title
+                <input id="story-title" name="title" maxlength="100" required>
+            </label>
+            <label for="story-type">What kind of story is this?
+                <select id="story-type" name="story_type">
+                    <option value="memory">A memory or tribute</option>
+                    <option value="history">Family history</option>
+                </select>
+            </label>
+            <label for="story-about">Who is this story about? (optional)
+                <input id="story-about" name="about" maxlength="120" placeholder="A family member, place, or generation">
+            </label>
+            <label for="story-text">Write the story (optional if you add audio)
+                <textarea id="story-text" name="text" maxlength="5000" placeholder="Share a memory, a family tradition, or a piece of history…"></textarea>
+            </label>
+            <p class="field-help">You can add text, audio, or both. Audio recordings can be up to 5 MB.</p>
+            <div class="audio-tools">
+                <h3>Add a voice recording</h3>
+                <label for="story-audio">Upload an audio file
+                    <input id="story-audio" name="audio" type="file" accept=".m4a,.mp3,.mp4,.ogg,.wav,.webm,audio/*">
+                </label>
+                <div class="audio-buttons">
+                    <button id="start-recording" type="button">Record on this page</button>
+                    <button id="stop-recording" class="secondary" type="button" hidden>Stop recording</button>
+                    <button id="clear-audio" class="secondary" type="button" hidden>Clear selected audio</button>
+                </div>
+                <p id="recording-status" class="recording-status" role="status" aria-live="polite"></p>
+                <div id="audio-preview" class="audio-preview" hidden></div>
+                <div id="existing-audio" class="audio-preview" hidden>
+                    <audio id="existing-audio-player" controls preload="metadata"></audio>
+                    <button id="remove-existing-audio" class="secondary" type="button">Remove saved recording</button>
+                </div>
+            </div>
+            <p id="form-error" class="form-error" role="alert"></p>
+            <div class="form-actions">
+                <button id="save-story" type="submit">Add story to the board</button>
+                <button id="cancel-story" class="secondary" type="button">Cancel</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script>
+        const family = {{ family|tojson }};
+        const storiesBoard = document.getElementById('story-board');
+        const status = document.getElementById('status');
+        const emptyState = document.getElementById('empty-state');
+        const noResults = document.getElementById('no-results');
+        const searchInput = document.getElementById('story-search');
+        const storyFilter = document.getElementById('story-filter');
+        const storyDialog = document.getElementById('story-dialog');
+        const storyForm = document.getElementById('story-form');
+        const audioInput = document.getElementById('story-audio');
+        const recordedAudioInput = storyForm.elements.namedItem('remove_audio');
+        const recordingStatus = document.getElementById('recording-status');
+        const audioPreview = document.getElementById('audio-preview');
+        const existingAudio = document.getElementById('existing-audio');
+        const existingAudioPlayer = document.getElementById('existing-audio-player');
+        const removeExistingAudioButton = document.getElementById('remove-existing-audio');
+        const clearAudioButton = document.getElementById('clear-audio');
+        let stories = [];
+        let mediaRecorder = null;
+        let mediaStream = null;
+        let recordingChunks = [];
+        let recordingSize = 0;
+        let recordingTooLarge = false;
+        let recordedAudioFile = null;
+        let previewUrl = '';
+        let editingStory = null;
+
+        function setStatus(message, isError = false) {
+            status.textContent = message;
+            status.classList.toggle('error', isError);
+        }
+
+        function setRecordingStatus(message, isError = false) {
+            recordingStatus.textContent = message;
+            recordingStatus.classList.toggle('form-error', isError);
+        }
+
+        function revokePreview() {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            previewUrl = '';
+            audioPreview.replaceChildren();
+            audioPreview.hidden = true;
+        }
+
+        function showAudioPreview(source, temporary = false) {
+            revokePreview();
+            if (!source) return;
+            if (temporary) previewUrl = source;
+            const player = document.createElement('audio');
+            player.controls = true;
+            player.preload = 'metadata';
+            player.src = source;
+            audioPreview.appendChild(player);
+            audioPreview.hidden = false;
+        }
+
+        function showSavedAudio() {
+            const showSaved = Boolean(editingStory?.audio_url) && recordedAudioInput.value !== 'true';
+            existingAudio.hidden = !showSaved;
+            if (showSaved) existingAudioPlayer.src = editingStory.audio_url;
+            else existingAudioPlayer.removeAttribute('src');
+        }
+
+        function releaseMicrophone() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+        }
+
+        function resetAudioControls() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+            releaseMicrophone();
+            mediaRecorder = null;
+            recordingChunks = [];
+            recordingSize = 0;
+            recordingTooLarge = false;
+            recordedAudioFile = null;
+            audioInput.value = '';
+            recordedAudioInput.value = 'false';
+            revokePreview();
+            existingAudioPlayer.removeAttribute('src');
+            existingAudio.hidden = true;
+            clearAudioButton.hidden = true;
+            document.getElementById('start-recording').disabled = false;
+            document.getElementById('stop-recording').hidden = true;
+            setRecordingStatus('');
+        }
+
+        function formatDate(value) {
+            const date = new Date(value);
+            return Number.isNaN(date.getTime())
+                ? ''
+                : new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(date);
+        }
+
+        function makeStoryCard(story) {
+            const card = document.createElement('article');
+            card.className = 'story-note';
+            card.dataset.storyId = story.id;
+            const pin = document.createElement('span');
+            pin.className = 'story-pin';
+            pin.setAttribute('aria-hidden', 'true');
+
+            const heading = document.createElement('div');
+            heading.className = 'note-heading';
+            const category = document.createElement('span');
+            category.className = 'note-category';
+            category.textContent = story.story_type === 'history' ? 'Family history' : 'Memory & tribute';
+            heading.appendChild(category);
+            if (story.can_edit) {
+                const actions = document.createElement('div');
+                actions.className = 'note-actions';
+                const editButton = document.createElement('button');
+                editButton.type = 'button';
+                editButton.textContent = 'Edit';
+                editButton.addEventListener('click', () => openStoryEditor(story));
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () => deleteStory(story));
+                actions.append(editButton, deleteButton);
+                heading.appendChild(actions);
+            }
+
+            const title = document.createElement('h2');
+            title.textContent = story.title;
+            const about = document.createElement('p');
+            about.className = 'about-line';
+            about.textContent = story.about ? `Remembering ${story.about}` : '';
+            about.hidden = !story.about;
+            const text = document.createElement('p');
+            text.className = 'story-text';
+            text.textContent = story.text || (story.audio_url ? 'A voice recording shared with the family.' : '');
+            card.append(pin, heading, title, about, text);
+
+            if (story.audio_url) {
+                const audio = document.createElement('audio');
+                audio.className = 'audio-player';
+                audio.controls = true;
+                audio.preload = 'none';
+                audio.src = story.audio_url;
+                audio.setAttribute('aria-label', `Audio story: ${story.title}`);
+                card.appendChild(audio);
+            }
+
+            const footer = document.createElement('footer');
+            footer.className = 'note-footer';
+            const author = document.createElement('span');
+            author.textContent = `Shared by ${story.author}`;
+            const date = document.createElement('time');
+            date.dateTime = story.created_at;
+            date.textContent = formatDate(story.created_at);
+            footer.append(author, date);
+            card.appendChild(footer);
+            return card;
+        }
+
+        function renderStories() {
+            const query = searchInput.value.trim().toLocaleLowerCase();
+            const type = storyFilter.value;
+            const filtered = stories.filter(story => {
+                const matchesType = type === 'all' || story.story_type === type;
+                const content = `${story.title} ${story.about} ${story.text} ${story.author}`.toLocaleLowerCase();
+                return matchesType && content.includes(query);
+            });
+            storiesBoard.replaceChildren(...filtered.map(makeStoryCard));
+            emptyState.hidden = stories.length > 0;
+            noResults.hidden = stories.length === 0 || filtered.length > 0;
+        }
+
+        async function loadStories() {
+            const response = await fetch(`/api/family-stories/${family}`);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Unable to load family stories.');
+            stories = data.stories.sort((left, right) => (
+                new Date(right.created_at).getTime() - new Date(left.created_at).getTime()
+            ));
+            renderStories();
+            setStatus(stories.length ? `${stories.length} ${stories.length === 1 ? 'story' : 'stories'} on the board.` : 'No stories yet. Your family can start the board.');
+        }
+
+        async function getCsrfToken() {
+            const response = await fetch('/api/csrf');
+            const data = await response.json();
+            if (!response.ok || !data.csrf_token) throw new Error(data.error || 'Unable to verify your request.');
+            return data.csrf_token;
+        }
+
+        function openStoryEditor(story = null) {
+            resetAudioControls();
+            editingStory = story;
+            storyForm.reset();
+            storyForm.elements.namedItem('story_id').value = story?.id || '';
+            storyForm.elements.namedItem('title').value = story?.title || '';
+            storyForm.elements.namedItem('story_type').value = story?.story_type || 'memory';
+            storyForm.elements.namedItem('about').value = story?.about || '';
+            storyForm.elements.namedItem('text').value = story?.text || '';
+            recordedAudioInput.value = 'false';
+            document.getElementById('dialog-title').textContent = story ? 'Edit your family story' : 'Add a family story';
+            document.getElementById('save-story').textContent = story ? 'Save changes' : 'Add story to the board';
+            document.getElementById('form-error').textContent = '';
+            removeExistingAudioButton.hidden = !story?.audio_url;
+            showSavedAudio();
+            storyDialog.showModal();
+        }
+
+        function closeStoryEditor() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+            releaseMicrophone();
+            storyDialog.close();
+            resetAudioControls();
+            editingStory = null;
+            storyForm.reset();
+        }
+
+        async function startRecording() {
+            if (!window.isSecureContext) {
+                throw new Error('Browser recording requires HTTPS or localhost. You can upload an audio file instead.');
+            }
+            if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+                throw new Error('Audio recording is not supported in this browser. You can upload an audio file instead.');
+            }
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            if (!storyDialog.open) {
+                stream.getTracks().forEach(track => track.stop());
+                return;
+            }
+            mediaStream = stream;
+            const supportedTypes = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/mp4'];
+            const mimeType = supportedTypes.find(type => MediaRecorder.isTypeSupported(type));
+            mediaRecorder = mimeType
+                ? new MediaRecorder(mediaStream, { mimeType })
+                : new MediaRecorder(mediaStream);
+            const activeRecorder = mediaRecorder;
+            recordingChunks = [];
+            recordingSize = 0;
+            recordingTooLarge = false;
+            activeRecorder.addEventListener('dataavailable', event => {
+                if (!event.data.size) return;
+                recordingSize += event.data.size;
+                if (recordingSize > 5 * 1024 * 1024) {
+                    recordingTooLarge = true;
+                    if (activeRecorder.state === 'recording') activeRecorder.stop();
+                    return;
+                }
+                recordingChunks.push(event.data);
+            });
+            activeRecorder.addEventListener('stop', () => {
+                releaseMicrophone();
+                document.getElementById('start-recording').disabled = false;
+                document.getElementById('stop-recording').hidden = true;
+                document.getElementById('save-story').disabled = false;
+                if (!storyDialog.open) {
+                    recordingChunks = [];
+                    return;
+                }
+                if (recordingTooLarge) {
+                    recordingChunks = [];
+                    setRecordingStatus('That recording is larger than 5 MB. Record a shorter message.', true);
+                    return;
+                }
+                if (!recordingChunks.length) {
+                    setRecordingStatus('No audio was captured. Please try recording again.', true);
+                    return;
+                }
+                const blob = new Blob(recordingChunks, { type: activeRecorder.mimeType || 'audio/webm' });
+                if (blob.size > 5 * 1024 * 1024) {
+                    recordingChunks = [];
+                    setRecordingStatus('That recording is larger than 5 MB. Record a shorter message.', true);
+                    return;
+                }
+                const extension = blob.type.includes('ogg') ? '.ogg'
+                    : blob.type.includes('mp4') ? '.m4a'
+                        : '.webm';
+                recordedAudioFile = new File([blob], `family-story-${Date.now()}${extension}`, { type: blob.type });
+                audioInput.value = '';
+                recordedAudioInput.value = 'false';
+                existingAudio.hidden = true;
+                showAudioPreview(URL.createObjectURL(blob), true);
+                clearAudioButton.hidden = false;
+                setRecordingStatus('Recording ready to add to your story.');
+                recordingChunks = [];
+            });
+            mediaRecorder.start(1000);
+            document.getElementById('start-recording').disabled = true;
+            document.getElementById('stop-recording').hidden = false;
+            document.getElementById('save-story').disabled = true;
+            setRecordingStatus('Recording… select Stop recording when you are finished.');
+        }
+
+        async function deleteStory(story) {
+            if (!window.confirm(`Delete “${story.title}” from the family board?`)) return;
+            setStatus('Deleting story…');
+            try {
+                const csrfToken = await getCsrfToken();
+                const response = await fetch(`/api/family-stories/${family}/${encodeURIComponent(story.id)}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-Token': csrfToken }
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Unable to delete story.');
+                await loadStories();
+            } catch (error) {
+                setStatus(error.message, true);
+            }
+        }
+
+        document.getElementById('add-story').addEventListener('click', () => openStoryEditor());
+        document.getElementById('close-dialog').addEventListener('click', closeStoryEditor);
+        document.getElementById('cancel-story').addEventListener('click', closeStoryEditor);
+        searchInput.addEventListener('input', renderStories);
+        storyFilter.addEventListener('change', renderStories);
+
+        document.getElementById('start-recording').addEventListener('click', () => {
+            setRecordingStatus('');
+            startRecording().catch(error => setRecordingStatus(error.message, true));
+        });
+        document.getElementById('stop-recording').addEventListener('click', () => {
+            if (mediaRecorder?.state === 'recording') {
+                document.getElementById('save-story').disabled = false;
+                mediaRecorder.stop();
+            }
+        });
+        audioInput.addEventListener('change', () => {
+            recordedAudioFile = null;
+            recordedAudioInput.value = 'false';
+            const file = audioInput.files?.[0];
+            if (!file) {
+                clearAudioButton.hidden = true;
+                revokePreview();
+                showSavedAudio();
+                removeExistingAudioButton.hidden = !editingStory?.audio_url;
+                removeExistingAudioButton.textContent = 'Remove saved recording';
+                return;
+            }
+            existingAudio.hidden = true;
+            removeExistingAudioButton.hidden = true;
+            showAudioPreview(URL.createObjectURL(file), true);
+            clearAudioButton.hidden = false;
+            setRecordingStatus(`Selected ${file.name}.`);
+        });
+        clearAudioButton.addEventListener('click', () => {
+            audioInput.value = '';
+            recordedAudioFile = null;
+            clearAudioButton.hidden = true;
+            revokePreview();
+            showSavedAudio();
+            removeExistingAudioButton.hidden = !editingStory?.audio_url;
+            removeExistingAudioButton.textContent = 'Remove saved recording';
+            setRecordingStatus('');
+        });
+        removeExistingAudioButton.addEventListener('click', () => {
+            const removing = recordedAudioInput.value !== 'true';
+            recordedAudioInput.value = removing ? 'true' : 'false';
+            showSavedAudio();
+            removeExistingAudioButton.textContent = removing ? 'Keep saved recording' : 'Remove saved recording';
+        });
+
+        storyForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            const saveButton = document.getElementById('save-story');
+            const formError = document.getElementById('form-error');
+            saveButton.disabled = true;
+            formError.textContent = '';
+            try {
+                const csrfToken = await getCsrfToken();
+                const storyId = storyForm.elements.namedItem('story_id').value;
+                const body = new FormData(storyForm);
+                if (recordedAudioFile) body.set('audio', recordedAudioFile);
+                const response = await fetch(
+                    storyId
+                        ? `/api/family-stories/${family}/${encodeURIComponent(storyId)}`
+                        : `/api/family-stories/${family}`,
+                    {
+                        method: storyId ? 'PUT' : 'POST',
+                        headers: { 'X-CSRF-Token': csrfToken },
+                        body
+                    }
+                );
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Unable to save story.');
+                closeStoryEditor();
+                await loadStories();
+            } catch (error) {
+                formError.textContent = error.message;
+            } finally {
+                saveButton.disabled = false;
+            }
+        });
+
+        storyDialog.addEventListener('click', event => {
+            if (event.target === storyDialog) closeStoryEditor();
+        });
+        storyDialog.addEventListener('cancel', event => {
+            event.preventDefault();
+            closeStoryEditor();
+        });
+        loadStories().catch(error => setStatus(error.message, true));
+    </script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f8f5ef">
+    <title>My Family Profile | MyFam</title>
+    <style>
+        :root { color-scheme: light; font-family: Inter, "Segoe UI", Arial, sans-serif; color: #29251f; background: #f8f5ef; }
+        * { box-sizing: border-box; }
+        [hidden] { display: none; }
+        body { margin: 0; min-height: 100vh; }
+        header { align-items: center; border-bottom: 1px solid #e1dcd3; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; padding: 1rem max(1rem, calc((100% - 960px) / 2)); background: #fdfbf7; }
+        header a, main a { color: #745344; }
+        .brand { color: #29251f; font-family: Georgia, serif; font-size: 1.3rem; font-weight: 700; text-decoration: none; }
+        .profile-nav { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+        .nav-btn { border: 1px solid #e1dcd3; border-radius: 999px; padding: 0.45rem 0.9rem; text-decoration: none; font-size: 0.85rem; color: #29251f; background: transparent; transition: all 150ms; }
+        .nav-btn:hover { background: #fff; border-color: #5c4033; }
+        .nav-btn.active { background: #5c4033; color: #fff; border-color: #5c4033; }
+        main { margin: 0 auto; max-width: 960px; padding: 2rem 1rem 4rem; }
+        h1, h2 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; }
+        h1 { font-size: clamp(2.4rem, 7vw, 3.8rem); margin: 0.3rem 0; }
+        h2 { font-size: 1.6rem; margin: 0 0 1rem; }
+        .eyebrow { color: #71695f; font-size: 0.75rem; letter-spacing: 0.17em; text-transform: uppercase; }
+        .description, .status, .privacy-note { color: #71695f; line-height: 1.6; }
+        .status { min-height: 1.5em; }
+        .error { color: #a3332a; }
+        .panel { background: white; border: 1px solid #e1dcd3; margin-top: 1.5rem; padding: clamp(1rem, 4vw, 1.5rem); border-radius: 6px; }
+        .profile-heading { align-items: center; display: flex; gap: 1.2rem; margin-bottom: 1.5rem; }
+        .avatar, .photo img { background: #e9e1d7; border-radius: 50%; height: 6rem; object-fit: cover; width: 6rem; }
+        .avatar { align-items: center; color: #5c4033; display: flex; flex: 0 0 auto; font-size: 1.7rem; justify-content: center; }
+        form { display: grid; gap: 0.9rem; }
+        label { display: grid; font-size: 0.9rem; gap: 0.4rem; }
+        input, textarea { border: 1px solid #d5cec3; font: inherit; max-width: 100%; padding: 0.7rem; border-radius: 4px; }
+        textarea { min-height: 90px; resize: vertical; }
+        button { background: #5c4033; border: 1px solid #5c4033; color: white; cursor: pointer; font: inherit; padding: 0.65rem 1rem; border-radius: 4px; }
+        button.secondary { background: white; color: #5c4033; }
+        button:disabled { cursor: wait; opacity: 0.6; }
+        .photo-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+        .photo { border: 1px solid #e1dcd3; display: grid; gap: 0.7rem; justify-items: start; padding: 0.75rem; border-radius: 4px; }
+        .photo img { border-radius: 2px; height: 150px; width: 100%; }
+        .photo-current { color: #71695f; font-size: 0.85rem; }
+        .photo-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .privacy-note { font-size: 0.85rem; }
+        @media (max-width: 480px) { .profile-heading { align-items: flex-start; flex-direction: column; } }
+    </style>
+    <link rel="stylesheet" href="/static/css/ticker.css">
+</head>
+<body>
+    <header>
+        <a class="brand" href="/welcome">myfam</a>
+        <nav class="profile-nav" aria-label="Main navigation">
+            <a class="nav-btn" href="/welcome">Home</a>
+            <a class="nav-btn" href="/photos">Photos</a>
+            <a class="nav-btn" href="/documents">Documents</a>
+            <a class="nav-btn" href="/book">Book</a>
+            <a class="nav-btn" href="/calendar">Calendar</a>
+            <a class="nav-btn active" href="/profile">My profile</a>
+        </nav>
+    </header>
+    <main>
+        <p class="eyebrow">Your account</p>
+        <h1>My profile</h1>
+        <p class="description">Choose the name and picture your family sees in chat, and keep your family photos together.</p>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+
+        <section class="panel" aria-labelledby="profile-details-title">
+            <div class="profile-heading">
+                <img id="avatar-image" class="avatar" alt="Your profile picture" hidden>
+                <span id="avatar-initials" class="avatar" aria-hidden="true">?</span>
+                <div>
+                    <p class="eyebrow">Chat profile</p>
+                    <h2 id="profile-details-title">Profile details</h2>
+                </div>
+            </div>
+            <form id="profile-form">
+                <label>Display name
+                    <input name="display_name" maxlength="80" autocomplete="name" required>
+                </label>
+                <label>About me (optional)
+                    <textarea name="bio" maxlength="240" placeholder="A short introduction for your family"></textarea>
+                </label>
+                <button type="submit">Save profile</button>
+            </form>
+        </section>
+
+        <section class="panel" aria-labelledby="upload-title">
+            <h2 id="upload-title">Add a photo</h2>
+            <p class="description">Upload JPG, PNG, GIF, or WebP images up to 5 MB each. Your first photo becomes your chat picture automatically.</p>
+            <form id="upload-form">
+                <label for="photo-file">Choose a photo</label>
+                <input id="photo-file" name="photo" type="file" accept=".jpg,.jpeg,.png,.gif,.webp,image/jpeg,image/png,image/gif,image/webp" required>
+                <button type="submit">Upload photo</button>
+            </form>
+        </section>
+
+        <section class="panel" aria-labelledby="gallery-title">
+            <h2 id="gallery-title">My photos</h2>
+            <p class="privacy-note">Your uploaded photos and chat picture are visible to signed-in family members. Only you can manage or delete your uploads.</p>
+            <div id="photo-grid" class="photo-grid"></div>
+        </section>
+    </main>
+    <script>
+        const status = document.getElementById('status');
+        const profileForm = document.getElementById('profile-form');
+        const uploadForm = document.getElementById('upload-form');
+        const photoGrid = document.getElementById('photo-grid');
+        let currentProfile;
+
+        function setStatus(message, isError = false) {
+            status.textContent = message;
+            status.classList.toggle('error', isError);
+        }
+
+        async function csrfToken() {
+            const response = await fetch('/api/csrf');
+            const data = await response.json();
+            if (!response.ok || !data.csrf_token) throw new Error(data.error || 'Unable to verify your request.');
+            return data.csrf_token;
+        }
+
+        function renderAvatar(profile) {
+            const image = document.getElementById('avatar-image');
+            const initials = document.getElementById('avatar-initials');
+            const letters = profile.display_name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('');
+            initials.textContent = letters.toUpperCase() || '?';
+            initials.hidden = Boolean(profile.avatar_url);
+            image.hidden = !profile.avatar_url;
+            image.onerror = () => {
+                image.hidden = true;
+                initials.hidden = false;
+            };
+            if (profile.avatar_url) image.src = profile.avatar_url;
+            else image.removeAttribute('src');
+        }
+
+        function renderPhotos(profile) {
+            photoGrid.replaceChildren();
+            if (!profile.photos.length) {
+                const empty = document.createElement('p');
+                empty.className = 'description';
+                empty.textContent = 'No photos uploaded yet.';
+                photoGrid.appendChild(empty);
+                return;
+            }
+
+            profile.photos.forEach(photo => {
+                const card = document.createElement('article');
+                card.className = 'photo';
+                const image = document.createElement('img');
+                image.src = photo.url;
+                image.alt = 'Photo from your profile gallery';
+                image.loading = 'lazy';
+                card.appendChild(image);
+
+                if (photo.filename === profile.avatar_filename) {
+                    const selected = document.createElement('span');
+                    selected.className = 'photo-current';
+                    selected.textContent = 'Current chat picture';
+                    card.appendChild(selected);
+                }
+
+                const actions = document.createElement('div');
+                actions.className = 'photo-actions';
+                if (photo.filename !== profile.avatar_filename) {
+                    const usePhoto = document.createElement('button');
+                    usePhoto.type = 'button';
+                    usePhoto.className = 'secondary';
+                    usePhoto.textContent = 'Use in chat';
+                    usePhoto.addEventListener('click', () => updateProfile({
+                        display_name: profile.display_name,
+                        bio: profile.bio,
+                        avatar_filename: photo.filename
+                    }, 'Chat picture updated.'));
+                    actions.appendChild(usePhoto);
+                }
+                const deletePhoto = document.createElement('button');
+                deletePhoto.type = 'button';
+                deletePhoto.className = 'secondary';
+                deletePhoto.textContent = 'Delete';
+                deletePhoto.addEventListener('click', () => {
+                    if (window.confirm('Delete this photo from your profile?')) {
+                        removePhoto(photo.filename);
+                    }
+                });
+                actions.appendChild(deletePhoto);
+                card.appendChild(actions);
+                photoGrid.appendChild(card);
+            });
+        }
+
+        function renderProfile(profile) {
+            currentProfile = profile;
+            profileForm.elements.display_name.value = profile.display_name;
+            profileForm.elements.bio.value = profile.bio;
+            renderAvatar(profile);
+            renderPhotos(profile);
+        }
+
+        async function loadProfile() {
+            const response = await fetch('/api/profile');
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Unable to load your profile.');
+            renderProfile(data.profile);
+        }
+
+        async function updateProfile(values, successMessage = 'Profile saved.') {
+            setStatus('Saving profile…');
+            try {
+                const token = await csrfToken();
+                const response = await fetch('/api/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
+                    body: JSON.stringify(values)
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Unable to save your profile.');
+                setStatus(successMessage);
+                await loadProfile();
+            } catch (error) {
+                setStatus(error.message, true);
+            }
+        }
+
+        profileForm.addEventListener('submit', event => {
+            event.preventDefault();
+            updateProfile({
+                display_name: profileForm.elements.display_name.value,
+                bio: profileForm.elements.bio.value,
+                avatar_filename: currentProfile.avatar_filename
+            });
+        });
+
+        uploadForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            const button = uploadForm.querySelector('button');
+            const file = uploadForm.elements.photo.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                setStatus('Photo must be no larger than 5 MB.', true);
+                return;
+            }
+            button.disabled = true;
+            setStatus('Uploading photo…');
+            try {
+                const token = await csrfToken();
+                const response = await fetch('/api/profile/photos', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-Token': token },
+                    body: new FormData(uploadForm)
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Unable to upload photo.');
+                uploadForm.reset();
+                setStatus(data.message);
+                await loadProfile();
+            } catch (error) {
+                setStatus(error.message, true);
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        async function removePhoto(filename) {
+            setStatus('Deleting photo…');
+            try {
+                const token = await csrfToken();
+                const response = await fetch(`/api/profile/photos/${encodeURIComponent(filename)}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-Token': token }
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Unable to delete photo.');
+                setStatus(data.message);
+                await loadProfile();
+            } catch (error) {
+                setStatus(error.message, true);
+            }
+        }
+
+        loadProfile().catch(error => setStatus(error.message, true));
+    </script>
+    <script src="/static/js/ticker.js" defer></script>
+</body>
+</html>

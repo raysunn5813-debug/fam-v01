@@ -1,0 +1,316 @@
+/* ==========================================================================
+   MyFam - Family Portal Stylesheet
+   Separated CSS for index.html
+   ========================================================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    min-height: 100vh;
+}
+
+header {
+    background: #2c3e50;
+    color: #fff;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+main {
+    padding: 2rem 1rem;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+h2 {
+    margin-bottom: 0.75rem;
+    color: #2c3e50;
+}
+
+.section {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* Tabs */
+.auth-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #edf2f7;
+    padding-bottom: 0.5rem;
+}
+
+.auth-tabs button {
+    flex: 1;
+    background: transparent;
+    color: #64748b;
+    border: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.auth-tabs button:hover {
+    color: #2c3e50;
+    background: #f8fafc;
+}
+
+.auth-tabs button[aria-selected="true"] {
+    color: #2c3e50;
+    border-bottom-color: #1abc9c;
+}
+
+/* Forms */
+form {
+    display: grid;
+    gap: 1rem;
+}
+
+form[hidden] {
+    display: none !important;
+}
+
+label {
+    display: grid;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #475569;
+}
+
+input {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.7rem 0.85rem;
+    font: inherit;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus {
+    outline: none;
+    border-color: #1abc9c;
+    box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.2);
+}
+
+button[type="submit"] {
+    border: 0;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    background: #2c3e50;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+button[type="submit"]:hover {
+    background: #1abc9c;
+}
+
+button[type="submit"]:active {
+    transform: scale(0.99);
+}
+
+/* Status Messages */
+.message {
+    min-height: 1.5rem;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+.error {
+    color: #dc2626;
+}
+
+.success {
+    color: #16a34a;
+}
+
+/* ==========================================================================
+   Full-Screen Stars View (PIN Verification Screen)
+   ========================================================================== */
+.stars-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    overflow: hidden;
+    padding: 1.5rem;
+}
+
+.stars-view[hidden] {
+    display: none !important;
+}
+
+/* Background animated stars (Pointer events none ensures inputs can be clicked!) */
+.stars-view::before,
+.stars-view::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background-repeat: repeat;
+}
+
+/* Layer 1: Small stars */
+.stars-view::before {
+    background-image:
+        radial-gradient(1.5px 1.5px at 30px 40px, #ffffff, transparent),
+        radial-gradient(2px 2px at 70px 120px, rgba(255, 255, 255, 0.9), transparent),
+        radial-gradient(1px 1px at 140px 60px, #ffffff, transparent),
+        radial-gradient(2px 2px at 210px 190px, rgba(255, 255, 255, 0.85), transparent),
+        radial-gradient(1.5px 1.5px at 280px 110px, #6ee7b7, transparent),
+        radial-gradient(2px 2px at 350px 240px, rgba(255, 255, 255, 0.9), transparent),
+        radial-gradient(1px 1px at 420px 80px, #ffffff, transparent),
+        radial-gradient(2.5px 2.5px at 490px 170px, #93c5fd, transparent);
+    background-size: 500px 300px;
+    animation: stars-drift-1 12s ease-in-out infinite alternate;
+    opacity: 0.85;
+}
+
+/* Layer 2: Twinkling deeper stars */
+.stars-view::after {
+    background-image:
+        radial-gradient(2px 2px at 50px 80px, rgba(255, 255, 255, 0.75), transparent),
+        radial-gradient(1.5px 1.5px at 160px 220px, #fde047, transparent),
+        radial-gradient(2px 2px at 260px 40px, rgba(255, 255, 255, 0.8), transparent),
+        radial-gradient(1px 1px at 380px 160px, #ffffff, transparent),
+        radial-gradient(3px 3px at 460px 290px, rgba(255, 255, 255, 0.95), transparent);
+    background-size: 600px 360px;
+    animation: stars-drift-2 18s ease-in-out infinite alternate;
+    opacity: 0.6;
+}
+
+@keyframes stars-drift-1 {
+    0% { transform: translateY(0px) scale(1); }
+    100% { transform: translateY(-20px) scale(1.03); }
+}
+
+@keyframes stars-drift-2 {
+    0% { transform: translateY(0px) scale(1); opacity: 0.5; }
+    50% { opacity: 0.85; }
+    100% { transform: translateY(-35px) scale(1.05); opacity: 0.5; }
+}
+
+/* Stars Container Card */
+.stars-container {
+    position: relative;
+    z-index: 10;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(26, 188, 156, 0.2);
+}
+
+.stars-container h2 {
+    color: #f8fafc;
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.stars-container .subtitle {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    margin-bottom: 1.75rem;
+}
+
+.stars-container label {
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.pin-input {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 2px solid rgba(255, 255, 255, 0.25) !important;
+    border-radius: 8px;
+    color: #ffffff !important;
+    font-size: 1.75rem !important;
+    letter-spacing: 0.5em;
+    text-align: center;
+    padding: 0.75rem 1rem !important;
+    width: 100%;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.pin-input:focus {
+    border-color: #1abc9c !important;
+    background: rgba(255, 255, 255, 0.14) !important;
+    box-shadow: 0 0 15px rgba(26, 188, 156, 0.4) !important;
+}
+
+.stars-container button[type="submit"] {
+    background: #1abc9c;
+    color: #fff;
+    width: 100%;
+    padding: 0.85rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(26, 188, 156, 0.35);
+}
+
+.stars-container button[type="submit"]:hover {
+    background: #16a085;
+}
+
+.stars-back-btn {
+    display: inline-block;
+    margin-top: 1.25rem;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.stars-back-btn:hover {
+    color: #f8fafc;
+}
+

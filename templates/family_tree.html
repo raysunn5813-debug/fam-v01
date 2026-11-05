@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f4e8d3">
+    <title>{{ family_label }} Family Tree</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: #1b2a47;
+            background: #f4e8d3;
+            --leaf: #4a6b2d;
+            --deep-leaf: #3b2415;
+            --earth: #3b2415;
+            --gold: #d4af37;
+            --muted: #71695f;
+            --line: #d9c8a9;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background-color: #f4e8d3;
+            background-image: radial-gradient(circle at center, #fdfbf7 0%, #f4e8d3 60%, #e0cda7 100%);
+            animation: fade-in 1s ease-in-out;
+        }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        main { margin: 0 auto; max-width: 1200px; padding: 2.5rem 1rem 4rem; }
+        nav { align-items: center; display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.5rem; }
+        nav a {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.38);
+            border-radius: 999px;
+            color: #1b2a47;
+            display: inline-block;
+            font-size: 0.8rem;
+            letter-spacing: 0.04em;
+            padding: 0.55rem 0.9rem;
+            text-decoration: none;
+            transition: color 180ms ease, background 180ms ease;
+        }
+        nav a:hover { background: #1b2a47; color: #d4af37; }
+        .tree-header { margin: 0 auto 1.5rem; max-width: 1000px; position: relative; text-align: center; }
+        h1, h2 { font-family: "Playfair Display", Georgia, serif; font-weight: 500; }
+        h1 {
+            color: #1b2a47;
+            filter: drop-shadow(0 2px 2px rgba(27,42,71,0.12));
+            font-family: "Great Vibes", "Brush Script MT", cursive;
+            font-size: clamp(3.5rem, 6vw, 5.25rem);
+            line-height: 1.1;
+            margin: 0;
+        }
+        h2 { font-size: 1.65rem; margin: 0 0 1rem; }
+        .eyebrow { color: #8a7135; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; }
+        .description, .status, .tree-hint { color: var(--muted); line-height: 1.6; }
+        .tree-header .description { font-family: "Playfair Display", Georgia, serif; font-size: 1.1rem; font-style: italic; margin: 0.4rem 0 0; }
+        .status { min-height: 1.5em; }
+        .error { color: #a3332a; }
+        .tree-hint { text-align: center; }
+        .tree-stage { margin: 0 auto; max-width: 100%; overflow-x: auto; }
+        .tree-svg { display: block; filter: drop-shadow(0 18px 18px rgba(59,36,21,0.12)); height: auto; margin: 0 auto; max-width: none; }
+        .tree-empty { background: rgba(253,251,247,0.88); border: 1px solid var(--line); border-radius: 0.8rem; margin: 1rem auto; max-width: 32rem; padding: 1.25rem; text-align: center; }
+        .name-plate { cursor: pointer; outline: none; }
+        .name-plate rect { fill: #fef9f0; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); stroke: #d4af37; stroke-width: 2px; transition: fill 180ms ease, stroke-width 180ms ease; }
+        .name-plate text { fill: #1b2a47; font-family: "Playfair Display", Georgia, serif; font-size: 11px; font-weight: 600; pointer-events: none; text-anchor: middle; transition: fill 180ms ease; }
+        .name-plate:hover rect, .name-plate:focus rect { fill: #1b2a47; stroke-width: 3px; }
+        .name-plate:hover text, .name-plate:focus text { fill: #d4af37; }
+        .member-avatar { fill: #f4e8d3; stroke: #d4af37; stroke-width: 1.5px; }
+        .member-initials { fill: #1b2a47; font-family: Inter, sans-serif; font-size: 9px; font-weight: 700; text-anchor: middle; }
+        .branch { fill: none; stroke: #3b2415; stroke-linecap: round; stroke-dasharray: 2000; stroke-dashoffset: 2000; animation: grow-branch 3s ease-out forwards; }
+        @keyframes grow-branch { to { stroke-dashoffset: 0; } }
+        .person-details { align-items: center; background: rgba(253,251,247,0.92); border: 1px solid var(--gold); border-radius: 0.8rem; box-shadow: 0 12px 30px rgba(59,36,21,0.1); display: flex; gap: 1.2rem; margin-top: 1.2rem; padding: clamp(1rem, 4vw, 1.5rem); }
+        .detail-photo { background: #f4e8d3; border: 3px solid var(--gold); border-radius: 50%; flex: 0 0 6rem; height: 6rem; object-fit: cover; width: 6rem; }
+        .detail-copy { min-width: 0; }
+        .detail-copy h2 { margin: 0 0 0.4rem; }
+        .detail-copy p { color: var(--muted); line-height: 1.5; margin: 0.3rem 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+        .edit-person { margin-top: 0.65rem; }
+        .form-panel { background: rgba(253,251,247,0.9); border: 1px solid var(--line); border-radius: 0.8rem; margin-top: 2rem; padding: clamp(1rem, 4vw, 1.5rem); }
+        form { display: grid; gap: 0.9rem; }
+        label { display: grid; font-size: 0.9rem; gap: 0.4rem; }
+        input, select, textarea { background: #fffdf8; border: 1px solid #d9c8a9; border-radius: 0.35rem; font: inherit; max-width: 100%; padding: 0.7rem; }
+        input[type="file"] { background: #f8faf5; }
+        select[multiple] { min-height: 6rem; }
+        textarea { min-height: 90px; resize: vertical; }
+        button { background: #1b2a47; border: 1px solid var(--gold); border-radius: 999px; color: #fffaf0; cursor: pointer; font: inherit; justify-self: start; padding: 0.7rem 1.15rem; }
+        button:hover { background: #304568; }
+        button.secondary { background: #fffdf8; color: #1b2a47; }
+        button:disabled { cursor: wait; opacity: 0.65; }
+        .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+        .photo-preview { align-items: center; color: var(--muted); display: flex; flex-wrap: wrap; gap: 0.8rem; }
+        .photo-preview img { border: 2px solid var(--gold); border-radius: 50%; height: 5rem; object-fit: cover; width: 5rem; }
+        @media (max-width: 600px) {
+            main { padding-top: 1.25rem; }
+            .tree-svg { margin-left: 0; margin-right: 0; }
+            .person-details { align-items: flex-start; flex-direction: column; }
+            .detail-photo { height: 5rem; width: 5rem; }
+            .tree-hint { font-size: 0.88rem; }
+        }
+        [hidden] { display: none; }
+    </style>
+</head>
+<body>
+    <main>
+        <nav><a href="/welcome">← Back to family welcome page</a> · <a href="/family/{{ family }}/stories">Family stories</a> · <a href="/profile">My profile</a></nav>
+        <header class="tree-header">
+            <h1>{{ family_label }} Family Tree</h1>
+            <p class="description">The roots of our past, the branches of our future.</p>
+        </header>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+
+        <section aria-label="{{ family_label }} family tree">
+            <p class="tree-hint">Select a family member to see their story.</p>
+            <div class="tree-stage">
+                <svg id="family-tree" class="tree-svg" role="group" aria-label="Interactive family tree"></svg>
+                <div id="tree-empty" class="tree-empty" hidden>
+                    <strong>This tree is ready to grow.</strong>
+                    <p class="description">Add the first family member below. Their name and optional photo will appear in a pear on the tree.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="person-details" class="person-details" aria-live="polite" hidden>
+            <img id="detail-photo" class="detail-photo" alt="">
+            <div class="detail-copy">
+                <h2 id="detail-name"></h2>
+                <p id="detail-years"></p>
+                <p id="detail-parents"></p>
+                <p id="detail-notes"></p>
+                <button id="edit-person" class="secondary edit-person" type="button">Edit family member</button>
+            </div>
+        </section>
+
+        <section class="form-panel" aria-labelledby="form-heading">
+            <p class="eyebrow">Help our family tree grow</p>
+            <h2 id="form-heading">Add a family member</h2>
+            <form id="member-form" enctype="multipart/form-data">
+                <input type="hidden" name="member_id">
+                <input type="hidden" name="remove_photo" value="false">
+                <label>Name
+                    <input name="name" maxlength="120" required>
+                </label>
+                <label>Birth year (optional)
+                    <input name="birth_year" type="number" min="1000">
+                </label>
+                <label>Parents (optional; select more than one with Ctrl or Command)
+                    <select name="parent_ids" multiple></select>
+                </label>
+                <label>Notes (optional)
+                    <textarea name="notes" maxlength="500"></textarea>
+                </label>
+                <label for="member-photo">Family member photo (optional, JPG/PNG/GIF/WebP, up to 5 MB)
+                    <input id="member-photo" name="photo" type="file" accept=".jpg,.jpeg,.png,.gif,.webp,image/jpeg,image/png,image/gif,image/webp">
+                </label>
+                <div id="photo-preview" class="photo-preview" hidden>
+                    <img id="preview-image" alt="Photo preview">
+                    <span id="preview-caption"></span>
+                </div>
+                <button id="remove-photo" class="secondary" type="button" hidden>Remove current picture</button>
+                <div class="actions">
+                    <button type="submit">Add family member</button>
+                    <button class="secondary" type="button" id="cancel-edit" hidden>Cancel edit</button>
+                </div>
+            </form>
+        </section>
+    </main>
+    <script>
+        const family = {{ family|tojson }};
+        const svgNamespace = 'http://www.w3.org/2000/svg';
+        const treeSvg = document.getElementById('family-tree');
+        const treeEmpty = document.getElementById('tree-empty');
+        const membersForm = document.getElementById('member-form');
+        const parentSelect = membersForm.elements.parent_ids;
+        const status = document.getElementById('status');
+        const details = document.getElementById('person-details');
+        const photoInput = document.getElementById('member-photo');
+        const preview = document.getElementById('photo-preview');
+        const removePhotoButton = document.getElementById('remove-photo');
+        const currentYear = new Date().getFullYear();
+        let members = [];
+        let selectedMemberId = '';
+        let previewUrl = '';
+        membersForm.elements.birth_year.max = currentYear;
+
+        function setStatus(message, isError = false) {
+            status.textContent = message;
+            status.classList.toggle('error', isError);
+        }
+
+        function svgElement(tag, attributes = {}) {
+            const element = document.createElementNS(svgNamespace, tag);
+            Object.entries(attributes).forEach(([name, value]) => element.setAttribute(name, value));
+            return element;
+        }
+
+        function selectedParents() {
+            return Array.from(parentSelect.selectedOptions, option => option.value);
+        }
+
+        function generationMap() {
+            const memberById = new Map(members.map(member => [member.id, member]));
+            const generations = new Map();
+            const getGeneration = (member, visiting = new Set()) => {
+                if (generations.has(member.id)) return generations.get(member.id);
+                if (visiting.has(member.id)) return 0;
+                if (!member.parent_ids.length) {
+                    generations.set(member.id, 0);
+                    return 0;
+                }
+                const nextVisiting = new Set(visiting);
+                nextVisiting.add(member.id);
+                const parentGenerations = member.parent_ids
+                    .map(parentId => memberById.get(parentId))
+                    .filter(Boolean)
+                    .map(parent => getGeneration(parent, nextVisiting));
+                const generation = parentGenerations.length ? Math.max(...parentGenerations) + 1 : 0;
+                generations.set(member.id, generation);
+                return generation;
+            };
+            members.forEach(member => getGeneration(member));
+            return generations;
+        }
+
+        function wrapName(name, maxCharacters = 13) {
+            const words = name.trim().split(/\s+/);
+            const lines = [];
+            let line = '';
+            words.forEach(word => {
+                const candidate = line ? `${line} ${word}` : word;
+                if (candidate.length > maxCharacters && line) {
+                    lines.push(line);
+                    line = word;
+                } else {
+                    line = candidate;
+                }
+            });
+            if (line) lines.push(line);
+            if (lines.length > 3) {
+                lines.length = 3;
+                lines[2] = `${lines[2].slice(0, maxCharacters - 1)}…`;
+            }
+            return lines;
+        }
+
+        function drawTree() {
+            treeSvg.replaceChildren();
+            details.hidden = true;
+            if (!members.length) {
+                treeSvg.hidden = true;
+                treeEmpty.hidden = false;
+                return;
+            }
+            treeSvg.hidden = false;
+            treeEmpty.hidden = true;
+
+            const generations = generationMap();
+            const maxGeneration = Math.max(...generations.values());
+            const membersByGeneration = new Map();
+            members.forEach(member => {
+                const generation = generations.get(member.id);
+                if (!membersByGeneration.has(generation)) membersByGeneration.set(generation, []);
+                membersByGeneration.get(generation).push(member);
+            });
+            const widestGeneration = Math.max(...Array.from(membersByGeneration.values(), row => row.length));
+            const width = Math.max(1000, (widestGeneration - 1) * 170 + 220);
+            const topOffset = Math.max(0, maxGeneration - 8) * 70;
+            const height = 1000 + topOffset;
+            const centerX = width / 2;
+            treeSvg.setAttribute('viewBox', `0 ${-topOffset} ${width} ${height}`);
+            treeSvg.setAttribute('width', width);
+            treeSvg.setAttribute('height', height);
+
+            const defs = svgElement('defs');
+            const softEdge = svgElement('filter', { id: 'soft-edge' });
+            softEdge.append(
+                svgElement('feGaussianBlur', { stdDeviation: '15', result: 'blur' }),
+                svgElement('feComposite', { in: 'SourceGraphic', in2: 'blur', operator: 'over' })
+            );
+            defs.appendChild(softEdge);
+            members.forEach((member, index) => {
+                const clip = svgElement('clipPath', {
+                    id: `portrait-clip-${index}`,
+                    'clipPathUnits': 'userSpaceOnUse'
+                });
+                clip.appendChild(svgElement('circle', { cx: '16', cy: '20', r: '13' }));
+                defs.appendChild(clip);
+            });
+            treeSvg.appendChild(defs);
+
+            const artwork = svgElement('g', {
+                transform: `translate(${centerX - 500} 0)`,
+                'aria-hidden': 'true'
+            });
+            const canopy = svgElement('g', { opacity: '0.85', filter: 'url(#soft-edge)' });
+            [
+                [500, 400, 380, '#4a6b2d'],
+                [400, 300, 220, '#5d8035'], [650, 450, 250, '#5d8035'],
+                [350, 500, 180, '#6a8f3f'], [700, 250, 150, '#6a8f3f'],
+                [500, 250, 200, '#78a149'], [550, 550, 180, '#78a149'],
+                [300, 350, 140, '#88b055'], [750, 400, 160, '#88b055'],
+                [500, 400, 150, '#88b055']
+            ].forEach(([x, y, radius, color], index) => {
+                canopy.appendChild(svgElement('circle', {
+                    cx: x, cy: y, r: radius, fill: color,
+                    'data-canopy-layer': index
+                }));
+            });
+            artwork.appendChild(canopy);
+            artwork.appendChild(svgElement('path', {
+                d: 'M 440 1000 Q 460 750 490 650 Q 520 750 560 1000 Z',
+                fill: '#3b2415'
+            }));
+
+            const branches = svgElement('g', { class: 'branch' });
+            [
+                ['M 495 680 Q 500 450 500 200', 28],
+                ['M 495 680 Q 400 500 200 400', 26],
+                ['M 505 680 Q 600 500 800 400', 26],
+                ['M 350 520 Q 250 450 150 250', 16],
+                ['M 280 470 Q 250 600 150 550', 12],
+                ['M 200 400 Q 150 350 100 350', 10],
+                ['M 650 520 Q 750 450 850 250', 16],
+                ['M 720 470 Q 750 600 850 550', 12],
+                ['M 800 400 Q 850 350 900 350', 10],
+                ['M 500 500 Q 400 350 350 150', 16],
+                ['M 500 500 Q 600 350 650 150', 16],
+                ['M 500 300 Q 450 200 450 100', 10],
+                ['M 500 300 Q 550 200 550 100', 10],
+                ['M 400 350 Q 300 250 250 200', 10],
+                ['M 600 350 Q 700 250 750 200', 10],
+                ['M 350 150 Q 300 100 250 100', 6],
+                ['M 650 150 Q 700 100 750 100', 6],
+                ['M 250 200 Q 200 150 150 150', 6],
+                ['M 750 200 Q 800 150 850 150', 6],
+                ['M 450 100 Q 400 50 350 50', 6],
+                ['M 550 100 Q 600 50 650 50', 6]
+            ].forEach(([path, strokeWidth]) => {
+                branches.appendChild(svgElement('path', {
+                    d: path, stroke: '#3b2415', 'stroke-width': strokeWidth
+                }));
+            });
+            artwork.appendChild(branches);
+            treeSvg.appendChild(artwork);
+
+            membersByGeneration.forEach((row, generation) => {
+                row.forEach((member, index) => {
+                    const x = centerX + (index - (row.length - 1) / 2) * 170;
+                    const y = 670 - generation * 70;
+                const group = svgElement('g', {
+                    class: 'name-plate',
+                    transform: `translate(${x - 55} ${y})`,
+                    tabindex: '0',
+                    role: 'button',
+                    'aria-label': `View ${member.name}'s family information`
+                });
+                group.dataset.memberId = member.id;
+                group.appendChild(svgElement('rect', {
+                    width: '110', height: '40', rx: '20', ry: '20'
+                }));
+
+                if (member.photo_url) {
+                    group.appendChild(svgElement('image', {
+                        href: member.photo_url,
+                        x: '3',
+                        y: '7',
+                        width: '26',
+                        height: '26',
+                        preserveAspectRatio: 'xMidYMid slice',
+                        'clip-path': `url(#portrait-clip-${index})`
+                    }));
+                } else {
+                    const initials = member.name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('');
+                    const portraitFallback = svgElement('circle', {
+                        cx: '16', cy: '20', r: '13', class: 'member-avatar'
+                    });
+                    const initialText = svgElement('text', {
+                        x: '16', y: '23', class: 'member-initials'
+                    });
+                    initialText.textContent = initials.toUpperCase() || '?';
+                    group.append(portraitFallback, initialText);
+                }
+
+                wrapName(member.name, 11).slice(0, 2).forEach((line, lineIndex) => {
+                    const label = svgElement('text', {
+                        x: '69',
+                        y: 17 + lineIndex * 12,
+                        class: 'member-name'
+                    });
+                    label.textContent = line;
+                    group.appendChild(label);
+                });
+                group.addEventListener('click', () => showDetails(member.id));
+                group.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        showDetails(member.id);
+                    }
+                });
+                treeSvg.appendChild(group);
+                });
+            });
+        }
+
+        function showDetails(memberId) {
+            const member = members.find(item => item.id === memberId);
+            if (!member) return;
+            selectedMemberId = member.id;
+            const memberNames = new Map(members.map(item => [item.id, item.name]));
+            document.getElementById('detail-name').textContent = member.name;
+            document.getElementById('detail-years').textContent = member.birth_year
+                ? `Birth year: ${member.birth_year}` : 'Birth year not added';
+            const parents = member.parent_ids.map(id => memberNames.get(id)).filter(Boolean);
+            const parentDetails = document.getElementById('detail-parents');
+            parentDetails.textContent = parents.length ? `Parents: ${parents.join(', ')}` : '';
+            const notes = document.getElementById('detail-notes');
+            notes.textContent = member.notes || '';
+            const photo = document.getElementById('detail-photo');
+            photo.hidden = !member.photo_url;
+            photo.alt = member.photo_url ? `Photo of ${member.name}` : '';
+            if (member.photo_url) photo.src = member.photo_url;
+            else photo.removeAttribute('src');
+            details.hidden = false;
+        }
+
+        async function loadTree() {
+            const response = await fetch(`/api/family-tree/${family}`);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Unable to load family tree.');
+            members = data.members.map(member => ({
+                ...member,
+                parent_ids: Array.isArray(member.parent_ids) ? member.parent_ids : []
+            }));
+            drawTree();
+            const selected = members.find(member => member.id === selectedMemberId);
+            if (selected) showDetails(selected.id);
+
+            const selectedParentsBeforeRender = new Set(selectedParents());
+            const editingId = membersForm.elements.member_id.value;
+            parentSelect.replaceChildren();
+            members.filter(member => member.id !== editingId).forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.id;
+                option.textContent = member.name;
+                option.selected = selectedParentsBeforeRender.has(member.id);
+                parentSelect.appendChild(option);
+            });
+        }
+
+        async function getCsrfToken() {
+            const response = await fetch('/api/csrf');
+            const data = await response.json();
+            if (!response.ok || !data.csrf_token) throw new Error(data.error || 'Unable to verify your request.');
+            return data.csrf_token;
+        }
+
+        function clearPreview() {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            previewUrl = '';
+            preview.hidden = true;
+            const image = document.getElementById('preview-image');
+            image.hidden = false;
+            image.removeAttribute('src');
+            document.getElementById('preview-caption').textContent = '';
+        }
+
+        function resetForm() {
+            membersForm.reset();
+            membersForm.elements.member_id.value = '';
+            membersForm.elements.remove_photo.value = 'false';
+            membersForm.elements.birth_year.max = currentYear;
+            membersForm.querySelector('[type="submit"]').textContent = 'Add family member';
+            document.getElementById('form-heading').textContent = 'Add a family member';
+            document.getElementById('cancel-edit').hidden = true;
+            removePhotoButton.hidden = true;
+            clearPreview();
+        }
+
+        function startEditing(memberId) {
+            const member = members.find(item => item.id === memberId);
+            if (!member) return;
+            membersForm.elements.member_id.value = member.id;
+            membersForm.elements.name.value = member.name;
+            membersForm.elements.birth_year.value = member.birth_year || '';
+            membersForm.elements.notes.value = member.notes || '';
+            membersForm.elements.remove_photo.value = 'false';
+            Array.from(parentSelect.options).forEach(option => {
+                option.selected = member.parent_ids.includes(option.value);
+            });
+            membersForm.querySelector('[type="submit"]').textContent = 'Save changes';
+            document.getElementById('form-heading').textContent = 'Edit family member';
+            document.getElementById('cancel-edit').hidden = false;
+            removePhotoButton.hidden = !member.photo_url;
+            photoInput.value = '';
+            if (member.photo_url) {
+                document.getElementById('preview-image').src = member.photo_url;
+                const selectedName = selectedMemberId ? members.find(m => m.id === selectedMemberId)?.name : '';
+            document.getElementById('preview-caption').textContent = selectedName ? `Photo of ${selectedName}` : 'Current family photo';
+                preview.hidden = false;
+            } else {
+                clearPreview();
+            }
+            membersForm.elements.name.focus();
+            membersForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        photoInput.addEventListener('change', () => {
+            const file = photoInput.files[0];
+            membersForm.elements.remove_photo.value = 'false';
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                photoInput.value = '';
+                setStatus('Photo must be no larger than 5 MB.', true);
+                return;
+            }
+            clearPreview();
+            previewUrl = URL.createObjectURL(file);
+            const image = document.getElementById('preview-image');
+            image.hidden = false;
+            image.src = previewUrl;
+            document.getElementById('preview-caption').textContent = 'New photo preview';
+            preview.hidden = false;
+            setStatus('');
+        });
+
+        removePhotoButton.addEventListener('click', () => {
+            membersForm.elements.remove_photo.value = 'true';
+            photoInput.value = '';
+            removePhotoButton.hidden = true;
+            if (previewUrl) clearPreview();
+            else {
+                preview.hidden = false;
+                document.getElementById('preview-image').hidden = true;
+                document.getElementById('preview-caption').textContent = 'Current photo will be removed when saved.';
+            }
+        });
+
+        document.getElementById('edit-person').addEventListener('click', () => {
+            startEditing(selectedMemberId);
+        });
+
+        document.getElementById('cancel-edit').addEventListener('click', () => {
+            resetForm();
+            loadTree().catch(error => setStatus(error.message, true));
+        });
+
+        membersForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            const button = membersForm.querySelector('[type="submit"]');
+            const memberId = membersForm.elements.member_id.value;
+            button.disabled = true;
+            setStatus('Saving family member…');
+            try {
+                const csrfToken = await getCsrfToken();
+                const formData = new FormData(membersForm);
+                formData.set('parent_ids', JSON.stringify(selectedParents()));
+                const response = await fetch(
+                    memberId
+                        ? `/api/family-tree/${family}/${encodeURIComponent(memberId)}`
+                        : `/api/family-tree/${family}`,
+                    {
+                        method: memberId ? 'PUT' : 'POST',
+                        headers: { 'X-CSRF-Token': csrfToken },
+                        body: formData
+                    }
+                );
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Unable to save family member.');
+                selectedMemberId = data.member.id;
+                resetForm();
+                setStatus('Family member saved to the tree.');
+                await loadTree();
+                showDetails(selectedMemberId);
+            } catch (error) {
+                setStatus(error.message, true);
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        loadTree().catch(error => setStatus(error.message, true));
+    </script>
+</body>
+</html>
